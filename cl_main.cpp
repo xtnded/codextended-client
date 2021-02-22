@@ -277,12 +277,18 @@ void istate() {
 #endif
 
 void CL_Connect_f() {
-	void(*o)() = (void(*)())0x40F6A0;
+    void(*o)() = (void(*)())0x40F6A0;
 
-	o();
+    o();
 
-	if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
-		Cvar_Set("cl_allowDownload", "0");
+    if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
+        Cvar_Set("cl_allowDownload", "0");
+    }        
+    
+    char* info = clc_stringData + clc_stringOffsets[1];
+    char *fs_game = Info_ValueForKey(info, "fs_game"); //If servers fs_game is not set(no mods) but client has fs_game set to some value it's gonna restart it to "" so he won't get custom huds from last modded server he was connected to
+	if (fs_game == "") {
+		Cvar_Set("fs_game", fs_game); 
 	}
 }
 
