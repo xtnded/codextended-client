@@ -5,7 +5,7 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 
 ## Changes/additions
 
-- servername whitelist (no more [] symbols)
+- servername whitelist (no more [] symbols, unnamed servers and spaces in server name)
 - fix for invalid CD-Key when using fs_game / mods
 - cURL (HTTP/fast) download
 - CoD 4-like scoreboard & loading screen
