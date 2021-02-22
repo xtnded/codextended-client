@@ -10,7 +10,9 @@ Goal of CoD1x is to fix and improve the original 1.1 client, by adding features 
 - CD-Key is invalid error when mod is loaded fix
 - HTTP Redirect
 - various bugfixes
-- [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
+
+# Presentation of several functions
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
 
 ## To be added
 
