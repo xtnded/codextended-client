@@ -15,6 +15,8 @@ Goal of CoD1x is to fix and improve the original 1.1 client, by adding features 
 ## To be added
 
 - whitelist unnamed server
+- fs_game cvar value set to "" on non-modded servers
+- if cvar cl_wwwdownload is set to 0 then redirect to local downloading (slow 13KB/s)
 
 ## Credits
 - php
