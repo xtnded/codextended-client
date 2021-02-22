@@ -1,0 +1,317 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{2ed725c6-0bd8-442c-a9de-8991ebc960d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Awesomium">
+      <UniqueIdentifier>{7ccb67cd-aabf-4a34-8fe5-26d64f757df6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="steam_rename_mod_lib">
+      <UniqueIdentifier>{a5ec0fb3-fe62-4286-9050-a94f9aa825ab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mem_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdd_serial_number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="steam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detours.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dl_public.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keycodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exmaster_client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\ClientEngineMapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\IClientEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\InterfaceMapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\InterfaceMapperBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\ISteamClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\Local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\SafeClientEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\StdInc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\SteamComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\SteamComponentAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\SteamLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\extern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\itab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\decode.h">
+      <Filter>NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\syn.h">
+      <Filter>NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="components\steam\libudis86\udint.h">
+      <Filter>NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="texturebuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stockmapinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Browser\AwesomiumSurface.h">
+      <Filter>Awesomium</Filter>
+    </ClInclude>
+    <ClInclude Include="Browser\glext.h">
+      <Filter>Awesomium</Filter>
+    </ClInclude>
+    <ClInclude Include="Browser\Browser.h">
+      <Filter>Awesomium</Filter>
+    </ClInclude>
+    <ClInclude Include="Browser\method_dispatcher.h">
+      <Filter>Awesomium</Filter>
+    </ClInclude>
+    <ClInclude Include="Browser\js_delegate.h">
+      <Filter>Awesomium</Filter>
+    </ClInclude>
+    <ClInclude Include="bitstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="codextended.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win_authority.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cvar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fixes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serverlist_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xuid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="librarymodule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="steam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mss32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cgame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="crypt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="script.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scr_mysql.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="net.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dl_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="files.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_chat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exmaster_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\decode.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\itab.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\syn.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\syn-att.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\syn-intel.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\libudis86\udis86.c">
+      <Filter>NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="xtexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xuidtool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Browser\AwesomiumSurface.cpp">
+      <Filter>Awesomium</Filter>
+    </ClCompile>
+    <ClCompile Include="Browser\Browser.cpp">
+      <Filter>Awesomium</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\SteamLoader.cpp">
+      <Filter>steam_rename_mod_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\SteamComponent.cpp">
+      <Filter>steam_rename_mod_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\SafeClientEngine.cpp">
+      <Filter>steam_rename_mod_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\InterfaceMapper.cpp">
+      <Filter>steam_rename_mod_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="components\steam\ClientEngineMapper.cpp">
+      <Filter>steam_rename_mod_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="xm_phandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="codextended_proj.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="cod.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="detours.lib" />
+    <Library Include="libcurl.lib" />
+  </ItemGroup>
+</Project>
