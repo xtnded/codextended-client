@@ -1,31 +1,30 @@
-# CoD1X Client
+# Call of Duty Extended [Client]
 
-
-CoD1x Client is a modification of the Call of Duty 1 client game. It supports patch 1.1, which is the most popular patch with around 100 servers.
-Goal of CoD1x is to fix and improve the original 1.1 client, by adding features that are present in newer, but less popular patches, and also by adding some of our own unique features (e.g. CoD4 Look like statistics bar).
+Call of Duty Extended Client is a modification of the Call of Duty 1 client game. It supports patch 1.1.
+Goal of this project is to fix bugs from the original 1.1 client, add features that are present in newer, but less popular patches, and also to add some of our own unique features (e.g. Discord RPC, CoD 4-like UI elements).
 
 ## Changes/additions
 
 - servername whitelist (no more [] symbols)
-- CD-Key is invalid error when mod is loaded fix
-- HTTP Redirect
-- various bugfixes
+- fix for invalid CD-Key when using fs_game / mods
+- cURL (HTTP/fast) download
+- CoD 4-like scoreboard & loading screen
+- more bugfixes, etc.
 
-# Presentation of several functions
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
+## Usage
 
-## To be added
+Compile<br>
+Rename old mss32.dll to miles32.dll<br>
+Copy newly compiled DLL to game directory and rename it to mss32.dll<br>
+???<br>
+PROFIT<br>
 
-- whitelist unnamed server
-- fs_game cvar value set to "" on non-modded servers
-- if cvar cl_wwwdownload is set to 0 then redirect to local downloading (slow 13KB/s)
+## Questions
 
-## Credits
-- php
+Forum: http://xtnded.org (php)<br>
+Steam: riicchhaarrd (php)<br>
+Discord: Defected#0001 (dftd) / Prawy#3490 (PrawyCoD1)<br>
 
-Put dependencies into the folder dependencies
+## License
 
-For example
-SOIL
-steamworks_sdk_134
-mysql-connector-c-6.1.6-win32
+CoDExtended is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
