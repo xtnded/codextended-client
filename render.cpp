@@ -460,15 +460,17 @@ void RB_EndSurface(void) {
 	endsurface.Apply();
 }
 
-#include "Browser/Browser.h"
+//#include "Browser/Browser.h"
 
 void APIENTRY qglBindTexture(GLenum target, GLuint texture) {
 
+#if 0
 	if (hook_bind) {
 		GetDefaultBrowser()->Bind();
 		hook_bind = false;
 		return;
 	}
+#endif
 
 	//fprintf(logfile, "lastshader = %s\n", lastShader->name);
 	//hook here the glbindtex

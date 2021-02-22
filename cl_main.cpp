@@ -435,7 +435,7 @@ void CL_InitDownloads() {
 	CL_DownloadsComplete();
 }
 
-#include "Browser/Browser.h"
+//#include "Browser/Browser.h"
 
 void CL_Frame(int msec) {
 	void(*call)(int);
@@ -444,9 +444,11 @@ void CL_Frame(int msec) {
 	if (!cl_running->integer)
 		return;
 	
+#if 0
 	Browser *br = GetDefaultBrowser();
 	if(br!=nullptr)
 	br->Update();
+#endif
 	
 	void Enc_SendHeartbeat();
 	Enc_SendHeartbeat();

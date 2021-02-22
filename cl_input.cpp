@@ -128,7 +128,7 @@ void __declspec(naked) CL_CharEvent() {
 #define IS_TOGGLING_OVERLAY (keys[SHIFT_KEY].down && keys[SPACE_KEY].repeats <= 1 && keys[SPACE_KEY].down && key == SPACE_KEY)
 qkey_t qeys[MAX_KEYS] = { 0 };
 
-#include "Browser/Browser.h"
+//#include "Browser/Browser.h"
 
 void CL_KeyEvent(int key, int down, unsigned int time) {
 	call<void*, int, int, unsigned>(0x40DC30, key, down, time);
@@ -171,10 +171,10 @@ void CL_KeyEvent(int key, int down, unsigned int time) {
 	}
 
 	if (key == 171) { //f5
-		GetDefaultBrowser()->RefreshPage(true);
+		//GetDefaultBrowser()->RefreshPage(true);
 	}
 	else if (key == 172) { //f6
-		GetDefaultBrowser()->Screenshot("./browser_shot.jpg");
+		//GetDefaultBrowser()->Screenshot("./browser_shot.jpg");
 	}
 	else if (key == K_MOUSE1) {
 #if 0

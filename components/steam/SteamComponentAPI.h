@@ -6,7 +6,7 @@
  */
 
 #pragma once
-
+#include <functional>
 #include "ISteamClient.h"
 #include "IClientEngine.h"
 

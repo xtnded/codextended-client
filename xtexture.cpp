@@ -4049,9 +4049,6 @@ unsigned char icon_jpg[] = {
 };
 unsigned int icon_jpg_len = 6029;
 
-
-#include "texturebuffers.h"
-
 XTexture textureServerListIcon;
 XTexture textureIcon;
 

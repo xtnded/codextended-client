@@ -230,8 +230,8 @@ void Sys_Unload() {
 		return;
 	unloaded = true;
 
-	void DestroyDefaultBrowser();
-	DestroyDefaultBrowser();
+	//void DestroyDefaultBrowser();
+	//DestroyDefaultBrowser();
 
 	void CleanupThreads();
 	CleanupThreads();

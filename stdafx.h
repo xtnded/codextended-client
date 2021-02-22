@@ -231,6 +231,6 @@ public:
 	}
 };
 
-#define uMYSQL
+//#define uMYSQL
 
 // TODO: reference additional headers your program requires here

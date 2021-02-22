@@ -6,7 +6,7 @@
 //#pragma comment(linker, "/delayload:awesomium.dll")
 #pragma comment(lib, "awesomium.lib")
 
-#include <Awesomium/Surface.h>
+//#include <Awesomium/Surface.h>
 #include <gl/gl.h>
  
 class GLTextureSurface : public Awesomium::Surface {
