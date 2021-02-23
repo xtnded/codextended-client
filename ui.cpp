@@ -417,7 +417,7 @@ void UI_DrawConnectScreen(int overlay) {
 			if (*downloadName) {
 				void(*UI_DisplayDownloadInfo)(char*, float, float, float) = (void(*)(char*, float, float, float))UI_FILE_OFF(0x4000DEA0);
 
-				UI_DisplayDownloadInfo(downloadName, 320, 55, 0.25); //scale 0.25 so download looks nicer
+				UI_DisplayDownloadInfo(downloadName, 320, 55, 0.25);
 
 				return;
 			}
