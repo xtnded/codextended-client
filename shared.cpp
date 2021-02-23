@@ -539,7 +539,7 @@ void QDECL Com_sprintf(char *dest, int size, const char *fmt, ...) {
 	va_list argptr;
 
 	va_start(argptr, fmt);
-	ret = Q_vsnprintf(dest, size, fmt, argptr);
+	ret = vsnprintf(dest, size, fmt, argptr);
 	va_end(argptr);
 	if (ret == -1) {
 		Com_Printf("Com_sprintf: overflow of %i bytes buffer\n", size);
