@@ -381,11 +381,34 @@ void CL_NextDownload(void) {
 			clc_bWWWDl = true;
 		}
 		else {
-			//CL_BeginDownload( localName, remoteName );
-			const char *error = va("Download failure while getting '%s'\n", localName);
+			char downloadURL[MAX_OSPATH];
+			char baseURL[MAX_OSPATH];
+			int clc_downloadBlock;
+			int clc_downloadCount;
+			int downloadSize;
+			char downloadList[MAX_INFO_STRING];
+			Com_Printf("***** BeginDownload *****\n"
+				"Localname: %s\n"
+				"Remotename: %s\n"
+				"****************************\n", localName, remoteName);
+			Com_sprintf(downloadURL, sizeof(downloadURL), "%s/%s", baseURL, remoteName);
+			strncpy(cls_downloadName, localName, sizeof(cls_downloadName));
+			Com_sprintf(cls_downloadTempName, sizeof(cls_downloadTempName), "%s.tmp", localName);
 
-			Com_Error(ERR_DROP, error);
-			return;
+			// Set so UI gets access to it
+			Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
+			Cvar_Set("cl_downloadSize", "0");
+			Cvar_Set("cl_downloadCount", "0");
+			Cvar_Set("cl_downloadTime", va("%i", *cls_realtime));
+
+			clc_downloadBlock = 0; // Starting new file
+			clc_downloadCount = 0;
+
+			CL_AddReliableCommand(va("download %s", remoteName));
+			//const char *error = va("Download failure while getting '%s'\n", localName);
+
+			//Com_Error(ERR_DROP, error);
+			//return;
 		}
 
 		*cls_downloadRestart = qtrue;
