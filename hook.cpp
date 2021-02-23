@@ -133,7 +133,7 @@ bool apply_hooks() {
 	void SCR_DrawScreenField(stereoFrame_t stereoFrame);
 	__call(0x41703A, (int)SCR_DrawScreenField);
 	__call(0x417048, (int)SCR_DrawScreenField);
-	
+
 	char* __cdecl CL_ClearHostname(char*, char*, size_t);
     __call(0x412A2C, (int)CL_ClearHostname);
 

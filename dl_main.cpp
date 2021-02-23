@@ -3,9 +3,9 @@
 #include "dl_public.h"
 
 #ifdef USE_CURL
-#pragma comment(lib, "dependencies/libcurl/libcurl.lib")
+#pragma comment(lib, "libcurl.lib")
 
-#include "dependencies/libcurl/curl.h"
+#include "include/curl/curl.h"
 #endif
 
 #define APP_NAME        "ID_DOWNLOAD"
