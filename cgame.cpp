@@ -19,7 +19,6 @@ typedef enum {
 } e_cgame_trap;
 
 /* notepad ++ search for regex for e.g more parms with specific syscall num with
-
 _30074898\([^,]*, 61
 */
 
@@ -435,6 +434,7 @@ int CG_DrawScoreboard() {
 	showScoreboard = true;
 #define BASE_Y 80
 #define BANNER_SIZE 40
+#define BANNER_WIDTH 372
 
 #define BAR_OPACITY .2
 #define BAR_HEIGHT 20
@@ -501,7 +501,7 @@ int CG_DrawScoreboard() {
 			if (base_y >= BASE_Y) {
 				int g_ScoresBanner_None = RE_RegisterShaderNoMip(Cvar_VariableString("g_ScoresBanner_None"));
 
-				SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_SIZE, BANNER_SIZE, g_ScoresBanner_None);
+				SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, g_ScoresBanner_None);
 				M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("Players ( %d )", num_players - num_spectators), NULL, NULL, NULL);
 				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, "Kills", NULL, NULL, NULL);
 				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, "Deaths", NULL, NULL, NULL);
@@ -578,7 +578,7 @@ int CG_DrawScoreboard() {
 				if (base_y >= BASE_Y) {
 					int banner1 = RE_RegisterShaderNoMip(teambanner_n1);
 
-					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_SIZE, BANNER_SIZE, banner1);
+					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, banner1);
 					M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("%s ( %d )", teamname1, teamcount1), NULL, NULL, NULL);
 					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, "Kills", NULL, NULL, NULL);
 					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, "Deaths", NULL, NULL, NULL);
@@ -616,7 +616,7 @@ int CG_DrawScoreboard() {
 				if (base_y >= BASE_Y) {
 					int banner2 = RE_RegisterShaderNoMip(teambanner_n2);
 
-					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_SIZE, BANNER_SIZE, banner2);
+					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, banner2);
 					M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("%s ( %d )", teamname2, teamcount2), NULL, NULL, NULL);
 					
 					base_y += 5;
@@ -656,7 +656,7 @@ int CG_DrawScoreboard() {
 
 		int g_ScoresBanner_Spectators = RE_RegisterShaderNoMip(Cvar_VariableString("g_ScoresBanner_Spectators"));
 		if (base_y >= BASE_Y){
-			SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_SIZE, BANNER_SIZE, g_ScoresBanner_Spectators);
+			SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, g_ScoresBanner_Spectators);
 			M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("Spectators ( %d )", num_spectators), NULL, NULL, NULL);
 		}
 		for (int i = 0; i < sortedscores.size(); i++) {
