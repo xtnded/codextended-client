@@ -188,7 +188,7 @@ int DL_BeginDownload(const char *localName, const char *remoteName, int debug) {
 
 	curl_multi_add_handle(dl_multi, dl_request);
 
-	Cvar_Set("cl_downloadName", (char*)remoteName);
+	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName)); //spaces so whole link is visible now
 #endif
 	return 1;
 }
