@@ -11,9 +11,12 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 - CoD 4-like scoreboard & loading screen
 - more bugfixes, etc.
 
+## Presentation of several functions
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
+
 ## Usage
 
-Compile<br>
+Compile(as dev or release) - you need for that dependencies <br>
 Rename old mss32.dll to miles32.dll<br>
 Copy newly compiled DLL to game directory and rename it to mss32.dll<br>
 ???<br>
