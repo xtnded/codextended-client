@@ -5,13 +5,13 @@
 #define STEAM_SUPPORT
 
 #ifdef STEAM_SUPPORT
-#pragma comment(lib, "steam_api.lib")
-#include "steam/steam_api.h"
-#include "steam/isteamuserstats.h"
-#include "steam/isteamremotestorage.h"
-#include "steam/isteammatchmaking.h"
-#include "steam/isteamgameserver.h"
-#include "steam/steam_gameserver.h"
+#pragma comment(lib, "dependencies/steam/steam_api.lib")
+#include "dependencies/steam/steam_api.h"
+#include "dependencies/steam/isteamuserstats.h"
+#include "dependencies/steam/isteamremotestorage.h"
+#include "dependencies/steam/isteammatchmaking.h"
+#include "dependencies/steam/isteamgameserver.h"
+#include "dependencies/steam/steam_gameserver.h"
 
 extern bool bSteamAvailable;
 

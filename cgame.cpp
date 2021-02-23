@@ -19,7 +19,6 @@ typedef enum {
 } e_cgame_trap;
 
 /* notepad ++ search for regex for e.g more parms with specific syscall num with
-
 _30074898\([^,]*, 61
 */
 

@@ -28,13 +28,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\include;C:\soil\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\Users\R\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\redistributable_bin;C:\Users\R\Documents\GitHub\codextended-client\dependencies\soil\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\redistributable_bin;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEXTENDED_PROJ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Users\R\Documents\GitHub\codextended-client\dependencies\soil\src;C:\Users\R\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\soil\src;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/D "CURL_STATICLIB" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -188,7 +188,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEXTENDED_PROJ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\mysql-connector-c-6.1.6-win32\include;C:\Users\R\Downloads\steamworks_sdk_132\sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\mysql-connector-c-6.1.6-win32\include;C:\Users\xdrag\Downloads\steamworks_sdk_132\sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/D "CURL_STATICLIB" /D "PROJECT_EXE" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -196,7 +196,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\mysql-connector-c-6.1.6-win32\lib;C:\Users\R\Downloads\steamworks_sdk_132\sdk\redistributable_bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\mysql-connector-c-6.1.6-win32\lib;C:\Users\xdrag\Downloads\steamworks_sdk_132\sdk\redistributable_bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>

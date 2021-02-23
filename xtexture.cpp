@@ -2,14 +2,14 @@
 #include "render.h"
 #include "gl/gl.h"
 #include "gl/glu.h"
-#include <SOIL.h>
-#pragma comment(lib, "SOIL.lib")
+// #include "dependencies/SOIL/SOIL.H"
+// #pragma comment(lib, "dependencies/SOIL/SOIL.lib")
 #include <vector>
 
 static std::vector<XTexture> xtextures;
 
 bool XTexture::Load(const char *path) {
-	GLuint tex = SOIL_load_OGL_texture(path,
+	/* GLuint tex = SOIL_load_OGL_texture(path,
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO);
@@ -20,12 +20,12 @@ bool XTexture::Load(const char *path) {
 	loaded = true;
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); */
 	return true;
 }
 
 bool XTexture::LoadFromMemory(const unsigned char *buf, size_t buflen) {
-	GLuint tex = SOIL_load_OGL_texture_from_memory(buf, buflen,
+	/* GLuint tex = SOIL_load_OGL_texture_from_memory(buf, buflen,
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_POWER_OF_TWO);
@@ -38,7 +38,7 @@ bool XTexture::LoadFromMemory(const unsigned char *buf, size_t buflen) {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); */
 	return true;
 }
 unsigned char tile_serverlist_jpg[] = {
