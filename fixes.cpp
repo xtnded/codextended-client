@@ -13,6 +13,9 @@ bool fix_bugs() {
 	__call(0x41892B, (int)CLUI_GetCDKey); //self explainatory?
 	//__jmp(0x4180C0, (int)CLUI_GetCDKey);	
 
+	void DL_Name(const char *localName, char* remoteName); //fix for not full download name on slow dl
+	__call(0x41011C, (int)DL_Name);
+
 
 	// NOP out the calls to CL_Motd (crash upon startup net not loaded and socket being sent or smth)
 	__nop(0x40F6DA, 0x40F6DA + 5);
