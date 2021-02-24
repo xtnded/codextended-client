@@ -504,6 +504,11 @@ void CL_Frame(int msec) {
 
 	if (clc_bWWWDl)
 		CL_WWWDownload();
+
+	// fix: make discord optional!
+	void CL_DiscordFrame();
+	CL_DiscordFrame();
+
 #if 0
 	X_DEAD = true;
 	__try {

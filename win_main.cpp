@@ -254,9 +254,11 @@ void Sys_Unload() {
 	XUI_Destroy();
 	//MsgBox("XUI_DESTROYED");
 
+#if 0
 #ifdef DEBUG
 	_CrtDumpMemoryLeaks();
 	CloseHandle(hLogFile);
+#endif
 #endif
 }
 
@@ -375,6 +377,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	void XUI_Init();
 	XUI_Init();
+
+	// fix: make discord optional!
+	void CL_DiscordInitialize();
+	CL_DiscordInitialize();
 
 	return main(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
 #endif

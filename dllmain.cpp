@@ -31,6 +31,7 @@ BOOL APIENTRY DllMain( HMODULE hMod,
 		case DLL_PROCESS_ATTACH: {
 			DisableThreadLibraryCalls(hMod);
 			hModule = hMod;
+	#if 0
 	#ifdef DEBUG
 			if (hLogFile == INVALID_HANDLE_VALUE) {
 				hLogFile = CreateFile("./cod_mem_log.txt", GENERIC_WRITE,
@@ -39,6 +40,7 @@ BOOL APIENTRY DllMain( HMODULE hMod,
 				_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 				_CrtSetReportFile(_CRT_WARN, hLogFile);
 			}
+	#endif
 	#endif
 			
 			codextended();

@@ -73,23 +73,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\include;C:\soil\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\soil\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;C:\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\include;C:\soil\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\redistributable_bin;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\soil\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\steamworks_sdk_134\sdk\redistributable_bin;C:\Users\xdrag\Documents\GitHub\codextended-client\dependencies\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\include;C:\soil\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\soil\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;C:\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EXE|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\include;C:\soil\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\build\lib;C:\soil\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Patrik\Desktop\Extended\Client\dependencies\discord;C:\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,13 +104,15 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\steamworks_sdk_134\redistributable_bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>discord-rpc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command></Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,7 +137,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
-      <AdditionalDependencies>wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -168,14 +170,15 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def /delayload:awesomium.dll %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
-      <AdditionalDependencies>wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command></Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='EXE|Win32'">
@@ -200,14 +203,15 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
-      <AdditionalDependencies>wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command></Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -278,6 +282,7 @@
     <ClCompile Include="console.cpp" />
     <ClCompile Include="crypt.cpp" />
     <ClCompile Include="cvar.cpp" />
+    <ClCompile Include="discord.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

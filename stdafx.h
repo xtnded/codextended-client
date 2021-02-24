@@ -15,9 +15,11 @@
 // Windows Header Files:
 #include <windows.h>
 
+#if 0
 #ifdef DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#endif
 #endif
 
 #include <cstdio>
