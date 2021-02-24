@@ -57,7 +57,7 @@ char *Cvar_VariableString(const char *var_name) {
 Cvar_VariableStringBuffer
 ============
 */
-void Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize) {
+char* Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize) {
 	cvar_t *var;
 
 	var = Cvar_FindVar(var_name);
@@ -67,6 +67,7 @@ void Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize) 
 	else {
 		Q_strncpyz(buffer, var->string, bufsize);
 	}
+	return buffer;
 }
 
 /*

@@ -28,6 +28,8 @@
 #define MAX_STRING_TOKENS   256     // max tokens resulting from Cmd_TokenizeString
 #define MAX_TOKEN_CHARS     1024    // max length of an individual token
 
+#define MAX_RELIABLE_COMMANDS 64
+
 #define MAX_INFO_STRING     1024
 #define MAX_INFO_KEY        1024
 #define MAX_INFO_VALUE      1024
@@ -92,6 +94,7 @@ typedef enum {
 	CA_CHALLENGING,
 	CA_CONNECTED,
 } connstate_t;
+
 #if 0
 typedef enum {
 	CA_UNINITIALIZED,
@@ -188,6 +191,90 @@ typedef vec_t vec5_t[5];
 
 #define SnapVector( v ) {v[0] = ( (int)( v[0] ) ); v[1] = ( (int)( v[1] ) ); v[2] = ( (int)( v[2] ) );}
 
+typedef struct {
+	netsrc_t	sock;
+
+	int			dropped;			// between last packet and previous
+
+	netadr_t	remoteAddress;
+	int			qport;				// qport value to write when transmitting
+
+									// sequencing variables
+	int			incomingSequence;
+	int			outgoingSequence;
+
+	// incoming fragment assembly buffer
+	int			fragmentSequence;
+	int			fragmentLength;
+	byte		fragmentBuffer[MAX_MSGLEN];
+
+	// outgoing fragment buffer
+	// we need to space out the sending of large fragmented messages
+	qboolean	unsentFragments;
+	int			unsentFragmentStart;
+	int			unsentLength;
+	byte		unsentBuffer[MAX_MSGLEN];
+} netchan_t;
+
+typedef struct {
+
+	int			clientNum;
+	int			lastPacketSentTime;			// for retransmits during connection
+	int			lastPacketTime;				// for timeouts
+
+	netadr_t	serverAddress;
+	int			connectTime;				// for connection retransmits
+	int			connectPacketCount;			// for display on connection dialog
+	char		serverMessage[MAX_STRING_TOKENS];	// for display on connection dialog
+
+	int			challenge;					// from the server to use for connecting
+	int			checksumFeed;				// from the server for checksum calculations
+
+											// these are our reliable messages that go to the server
+	int			reliableSequence;
+	int			reliableAcknowledge;		// the last one the server has executed
+	char		reliableCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
+
+	// server message (unreliable) and command (reliable) sequence
+	// numbers are NOT cleared at level changes, but continue to
+	// increase as long as the connection is valid
+
+	// message sequence is used by both the network layer and the
+	// delta compression layer
+	int			serverMessageSequence;
+
+	// reliable messages received from server
+	int			serverCommandSequence;
+	int			lastExecutedServerCommand;		// last server command grabbed or executed with CL_GetServerCommand
+	char		serverCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
+
+	// file transfer from server
+	fileHandle_t download;
+	char		downloadTempName[MAX_OSPATH];
+	char		downloadName[MAX_OSPATH];
+	int			downloadNumber;
+	int			downloadBlock;	// block we are waiting for
+	int			downloadCount;	// how many bytes we got
+	int			downloadSize;	// how many bytes we got
+	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
+	qboolean	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
+
+									// demo information
+	char		demoName[MAX_QPATH];
+	qboolean	spDemoRecording;
+	qboolean	demorecording;
+	qboolean	demoplaying;
+	qboolean	demowaiting;	// don't record until a non-delta message is received
+	qboolean	firstDemoFrameSkipped;
+	fileHandle_t	demofile;
+
+	int			timeDemoFrames;		// counter of rendered frames
+	int			timeDemoStart;		// cls.realtime before first frame
+	int			timeDemoBaseTime;	// each frame will be at this time + frameNum * 50
+
+									// big stuff at end of structure so most offsets are 15 bits or less
+	netchan_t	netchan;
+} clientConnection_t;
 
 typedef void(*Cvar_Set_t)(char*, char*);
 typedef cvar_t* (*Cvar_Get_t)(const char*, const char*, int);
@@ -200,7 +287,8 @@ extern Cvar_FindVar_t Cvar_FindVar;
 char* Cvar_VariableString(const char*);
 
 void Q_strncpyz(char *dest, const char *src, int destsize);
-void QDECL Com_sprintf(char *dest, int size, const char *fmt, ...);
+void Com_sprintf(char *dest, int size, const char *fmt, ...);
+char* Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize);
 
 static void(*Cmd_ArgvBuffer)(int, char*, int) = (void(*)(int, char*, int))0x4285E0;
 char* Cmd_Argv(int index);
@@ -238,11 +326,6 @@ void Sys_SendPacket(int packet_size, void *packet, netadr_t to);
 qboolean    NET_StringToAdr(const char *s, netadr_t *a);
 const char  *NET_AdrToString(netadr_t a);
 
-typedef void(*CL_NextDownload_t)(void);
-static CL_NextDownload_t CL_NextDownload = (CL_NextDownload_t)0x410190;
-
-typedef void(*CL_BeginDownload_t)(const char*, const char*);
-static CL_BeginDownload_t CL_BeginDownload = (CL_BeginDownload_t)0x4100D0;
 
 typedef void(__fastcall *CL_Netchan_Encode_t)(msg_t*);
 extern CL_Netchan_Encode_t CL_Netchan_Encode;
@@ -252,6 +335,12 @@ extern Netchan_Transmit_t Netchan_Transmit;
 
 typedef void(*Netchan_TransmitNextFragment_t)(int chan);
 extern Netchan_TransmitNextFragment_t Netchan_TransmitNextFragment;
+
+typedef void(*CL_NextDownload_t)(void);
+static CL_NextDownload_t CL_NextDownload = (CL_NextDownload_t)0x410190;
+
+typedef void(*CL_BeginDownload_t)(const char*, const char*);
+static CL_BeginDownload_t CL_BeginDownload = (CL_BeginDownload_t)0x4100D0;
 
 typedef void(*MSG_initHuffman_t)(void);
 extern MSG_initHuffman_t MSG_initHuffman;
