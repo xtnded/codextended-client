@@ -293,13 +293,41 @@ void CL_Connect_f() {
 }
 
 void(*CL_DownloadsComplete)(void) = (void(*)())0x40FFB0;
-void(*CL_BeginDownload)(const char*, const char*) = (void(*)(const char*, const char*))0x4100D0;
+//void(*CL_BeginDownload)(const char*, const char*) = (void(*)(const char*, const char*))0x4100D0;
+/*
+void CL_BeginDownload(const char *localName, const char *remoteName) {
+Com_Printf("***** BeginDownload *****\n"
+	"Localname: %s\n"
+	"Remotename: %s\n"
+	"****************************\n", localName, remoteName);
+
+Q_strncpyz(downloadName, localName, sizeof(downloadName));
+Com_sprintf(cls_downloadTempName, sizeof(downloadTempName), "%s.tmp", localName);
+
+// Set so UI gets access to it
+Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
+Cvar_Set("cl_downloadSize", "0");
+Cvar_Set("cl_downloadCount", "0");
+Cvar_Set("cl_downloadTime", va("%i", *cls_realtime));
+
+downloadBlock = 0; // Starting new file
+downloadCount = 0;
+
+CL_AddReliableCommand(va("download %s", remoteName));
+}
+*/
+void test(const char *localName, char* remoteName) {
+
+	char *downloadName = Cvar_VariableString("cl_downloadName");
+	Com_Printf("Remotename: %s\n", remoteName);
+	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
+}
 
 static int use_regular_dl = 0;
 
 int dl_files_count = 0;
 
-void CL_NextDownload(void) {
+void CL_wNextDownload(void) {
 	char localTempName[MAX_PATH];
 	char remoteTempName[MAX_PATH];
 #if 0
@@ -359,6 +387,9 @@ void CL_NextDownload(void) {
 				"Remotename: %s\n"
 				"****************************\n", localName, remoteName);
 
+			//Q_strncpyz(downloadName, localName, sizeof(downloadName));
+			//Com_sprintf(cls_downloadTempName, sizeof(downloadTempName), "%s.tmp", localName);
+
 			Cvar_Set("cl_downloadSize", "0");
 			Cvar_Set("cl_downloadCount", "0");
 			Cvar_Set("cl_downloadTime", va("%i", *cls_realtime));
@@ -380,36 +411,6 @@ void CL_NextDownload(void) {
 
 			clc_bWWWDl = true;
 		}
-		else {
-			char downloadURL[MAX_OSPATH];
-			char baseURL[MAX_OSPATH];
-			int clc_downloadBlock;
-			int clc_downloadCount;
-			int downloadSize;
-			char downloadList[MAX_INFO_STRING];
-			Com_Printf("***** BeginDownload *****\n"
-				"Localname: %s\n"
-				"Remotename: %s\n"
-				"****************************\n", localName, remoteName);
-			Com_sprintf(downloadURL, sizeof(downloadURL), "%s/%s", baseURL, remoteName);
-			strncpy(cls_downloadName, localName, sizeof(cls_downloadName));
-			Com_sprintf(cls_downloadTempName, sizeof(cls_downloadTempName), "%s.tmp", localName);
-
-			// Set so UI gets access to it
-			Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
-			Cvar_Set("cl_downloadSize", "0");
-			Cvar_Set("cl_downloadCount", "0");
-			Cvar_Set("cl_downloadTime", va("%i", *cls_realtime));
-
-			clc_downloadBlock = 0; // Starting new file
-			clc_downloadCount = 0;
-
-			CL_AddReliableCommand(va("download %s", remoteName));
-			//const char *error = va("Download failure while getting '%s'\n", localName);
-
-			//Com_Error(ERR_DROP, error);
-			//return;
-		}
 
 		*cls_downloadRestart = qtrue;
 
@@ -420,6 +421,16 @@ void CL_NextDownload(void) {
 	}
 
 	CL_DownloadsComplete();
+}
+
+void X_CL_NextDownload(void) {
+	char* info = clc_stringData + clc_stringOffsets[1];
+	char *url = Info_ValueForKey(info, "sv_wwwBaseURL");
+
+	if(cl_wwwDownload->integer && *url )
+		CL_wNextDownload();
+	else
+	    CL_NextDownload();
 }
 
 void CL_WWWDownload() {
@@ -441,6 +452,7 @@ void CL_WWWDownload() {
 
 		//((void(*)())0x40F5F0)(); //CL_Disconnect_f
 		//Com_Error(ERR_DROP, error);
+		CL_DownloadsComplete();
 	}
 	((void(*)())0x40F640)(); //CL_Reconnect_f
 }

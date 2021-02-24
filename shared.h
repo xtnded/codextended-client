@@ -238,8 +238,11 @@ void Sys_SendPacket(int packet_size, void *packet, netadr_t to);
 qboolean    NET_StringToAdr(const char *s, netadr_t *a);
 const char  *NET_AdrToString(netadr_t a);
 
+typedef void(*CL_NextDownload_t)(void);
+static CL_NextDownload_t CL_NextDownload = (CL_NextDownload_t)0x410190;
 
-
+typedef void(*CL_BeginDownload_t)(const char*, const char*);
+static CL_BeginDownload_t CL_BeginDownload = (CL_BeginDownload_t)0x4100D0;
 
 typedef void(__fastcall *CL_Netchan_Encode_t)(msg_t*);
 extern CL_Netchan_Encode_t CL_Netchan_Encode;
