@@ -278,7 +278,7 @@ void __declspec(naked) InterceptCallToShutdownUI() {
 	}
 }
 
-static const char *GetFullStockGametypeName(char *l) {
+const char *GetFullStockGametypeName(char *l) {
 	if (!l || !*l)
 		return "Empty gametype";
 	char s[64] = { 0 };
@@ -301,6 +301,10 @@ static const char *GetFullStockGametypeName(char *l) {
 		return "Gungame";
 	else if (*s == 's' && *(s + 1) == 'd' && !*(s + 2))
 		return "Search & Destroy";
+	else if (*s == 'n' && *(s + 1) == 'e' && *(s + 2) == 'w' && *(s + 3) == '_' && *(s + 4) == 's' && *(s + 5) == 'd' && !*(s + 6))
+		return "Search & Destroy Remastered";
+	else if (*s == 'f' && *(s + 1) == 't' && *(s + 2) == 'a' && *(s + 3) == 'g' && !*(s + 4))
+		return "Freezetag";
 	else if (*s == 'o' && *(s + 1) == 'i' && *(s + 2) == 'c' && !*(s + 3))
 		return "One in the chamber";
 

@@ -55,24 +55,23 @@ void Discord_StatusPlaying() {
 
 	char* hostname_p = Info_ValueForKey(info, "sv_hostname");
 	char hostname[64] = { 0 };
-	if (strlen(hostname_p) == 0) {
-		Q_strncpyz(hostname, "Unnamed Server", sizeof(hostname));
-	} else {
-		Q_strncpyz(hostname, hostname_p, sizeof(hostname));
-	}
-
+	Q_strncpyz(hostname, hostname_p, sizeof(hostname));
 	char* mapname_p = Info_ValueForKey(info, "mapname");
 	char mapname[64] = { 0 };
 	Q_strncpyz(mapname, mapname_p, sizeof(mapname));
-
 	char* gametype_p = Info_ValueForKey(info, "g_gametype");
 	char gametype[64] = { 0 };
 	Q_strncpyz(gametype, gametype_p, sizeof(gametype));
 
 	DiscordRichPresence discordPresence;
 	memset(&discordPresence, 0, sizeof(discordPresence));
-	discordPresence.details = hostname;
-	discordPresence.state = gametype;
+
+	char* CL_ClearHostname(char* hostname, bool colors);
+	discordPresence.details = CL_ClearHostname(hostname, false);
+
+	const char* GetFullStockGametypeName(char* l);
+	discordPresence.state = GetFullStockGametypeName(gametype);
+
 	discordPresence.largeImageKey = mapname;
 	discordPresence.largeImageText = mapname;
 

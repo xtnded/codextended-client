@@ -134,8 +134,8 @@ bool apply_hooks() {
 	__call(0x41703A, (int)SCR_DrawScreenField);
 	__call(0x417048, (int)SCR_DrawScreenField);
 	
-	char* __cdecl CL_ClearHostname(char*, char*, size_t);
-    __call(0x412A2C, (int)CL_ClearHostname);
+	char* __cdecl CL_SetServerInfo_HostnameStrncpy(char*, char*, size_t);
+    __call(0x412A2C, (int)CL_SetServerInfo_HostnameStrncpy);
 
 #if 1
 

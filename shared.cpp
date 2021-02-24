@@ -898,7 +898,41 @@ void Info_SetValueForKey_Big(char *s, const char *key, const char *value) {
 	strcat(s, newi);
 }
 
+char* trimSpaces(char* str) {
+	char* end;
 
+	while (isspace((unsigned char)*str))
+		str++;
 
+	if (*str == 0) return str;
 
-//====================================================================
+	end = str + strlen(str) - 1;
+
+	while (end > str && isspace((unsigned char)*end))
+		end--;
+
+	end[1] = '\0';
+
+	return str;
+}
+
+char* Q_CleanStr(char* string, bool colors) {
+	char* d;
+	char* s;
+	int c;
+
+	s = string;
+	d = string;
+	while ((c = *s) != 0) {
+		if (Q_IsColorString(s) && !colors) {
+			s++;
+		}
+		else if (c >= 0x20 && c <= 0x7E) {
+			*d++ = c;
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return string;
+}

@@ -750,3 +750,21 @@ void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after cons
 	void CG_SCR_DrawScreenField(int);
 	CG_SCR_DrawScreenField(stereoFrame);
 }
+
+char* CL_ClearHostname(char* hostname, bool colors) {
+	char fixedHostname[1024];
+
+	hostname = trimSpaces(hostname); // Remove spaces.
+	Q_strncpyz(fixedHostname, hostname, sizeof(fixedHostname));
+	Q_CleanStr(fixedHostname, colors); // Remove symbols (colors).
+
+	if (strlen(fixedHostname) == 0) { // Rename servers with empty hostname.
+		strncpy(fixedHostname, "Unnamed Server", sizeof(fixedHostname));
+	}
+
+	return fixedHostname;
+}
+
+char* __cdecl CL_SetServerInfo_HostnameStrncpy(char* a1, char* a2, size_t a3) {
+	return strncpy(a1, CL_ClearHostname(a2, true), a3);
+}

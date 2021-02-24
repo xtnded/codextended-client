@@ -311,7 +311,6 @@
     <ClCompile Include="net.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="xtexture.cpp" />
-    <ClCompile Include="serverlist_info.cpp" />
     <ClCompile Include="shared.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="steam.cpp" />
