@@ -294,6 +294,10 @@ void CL_Connect_f() {
 
 void(*CL_DownloadsComplete)(void) = (void(*)())0x40FFB0;
 
+void Need_Paks() {
+	Com_Printf("");
+}
+
 void DL_Name(const char *localName, char* remoteName) {
 
 	char *downloadName = Cvar_VariableString("cl_downloadName");
