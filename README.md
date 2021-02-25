@@ -9,6 +9,7 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 - fix for invalid CD-Key when using fs_game / mods
 - cURL (HTTP/fast) download
 - CoD 4-like scoreboard & loading screen
+- Discord RPC
 - more bugfixes, etc.
 
 ## Presentation of several functions
