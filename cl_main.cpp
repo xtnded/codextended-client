@@ -426,7 +426,7 @@ void CL_WWWDownload() {
 		*cls_downloadRestart = 1;
 		CL_DownloadsComplete();
 	}
-	else {
+	else { //sv_wwwBaseURL check if incorrect 
 		const char *error = va( "Download failure while getting %s probably URL is incorrect", Cvar_VariableString("cl_downloadName") ); // get the msg before clearing structs
 		//clc_bWWWDl = false;
 		//use_regular_dl = 1;
