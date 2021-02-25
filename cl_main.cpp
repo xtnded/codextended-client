@@ -316,10 +316,13 @@ downloadCount = 0;
 CL_AddReliableCommand(va("download %s", remoteName));
 }
 */
-void test(const char *localName, char* remoteName) {
+void Need_Paks() {
+	Com_Printf("");
+}
+
+void DL_Name(const char *localName, char* remoteName) {
 
 	char *downloadName = Cvar_VariableString("cl_downloadName");
-	Com_Printf("Remotename: %s\n", remoteName);
 	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
 }
 
@@ -327,7 +330,7 @@ static int use_regular_dl = 0;
 
 int dl_files_count = 0;
 
-void CL_wNextDownload(void) {
+void WWW_BeginDownload(void) {
 	char localTempName[MAX_PATH];
 	char remoteTempName[MAX_PATH];
 #if 0
@@ -428,7 +431,7 @@ void X_CL_NextDownload(void) {
 	char *url = Info_ValueForKey(info, "sv_wwwBaseURL");
 
 	if(cl_wwwDownload->integer && *url )
-		CL_wNextDownload();
+		WWW_BeginDownload();
 	else
 	    CL_NextDownload();
 }
@@ -446,15 +449,15 @@ void CL_WWWDownload() {
 		CL_DownloadsComplete();
 	}
 	else {
-		//const char *error = va( "Download failure while getting '%s'\n", Cvar_VariableString("cl_downloadName") ); // get the msg before clearing structs
-		clc_bWWWDl = false;
-		use_regular_dl = 1;
+		const char *error = va( "Download failure while getting %s probably URL is incorrect", Cvar_VariableString("cl_downloadName") ); // get the msg before clearing structs
+		//clc_bWWWDl = false;
+		//use_regular_dl = 1;
 
-		//((void(*)())0x40F5F0)(); //CL_Disconnect_f
-		//Com_Error(ERR_DROP, error);
-		CL_DownloadsComplete();
+		Com_Error(ERR_DROP, error);
+		return;
+		//CL_DownloadsComplete();
 	}
-	((void(*)())0x40F640)(); //CL_Reconnect_f
+	//((void(*)())0x40F640)(); //CL_Reconnect_f
 }
 
 void CL_InitDownloads() {
@@ -465,11 +468,11 @@ void CL_InitDownloads() {
 		// this gets printed to UI, i18n
 		Com_Printf("Need paks: %s\n", clc_downloadList);
 
-		if (*clc_downloadList) {
-			// if autodownloading is not enabled on the server
-			*cls_state = 3;
-			CL_NextDownload();
-			return;
+	if (*clc_downloadList) {
+		// if autodownloading is not enabled on the server
+		*cls_state = 3;
+		CL_NextDownload();
+		return;
 		}
 	}
 
