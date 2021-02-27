@@ -130,23 +130,3 @@ typedef struct {
 } SCR_FUNCS;
 
 extern SCR_FUNCS Scr;
-
-#ifdef uMYSQL
-void GScr_mysql_init(int);
-void GScr_mysql_close(int);
-void GScr_mysql_affected_rows(int);
-void GScr_mysql_errno(int);
-void GScr_mysql_error(int);
-void GScr_mysql_fetch_field(int);
-void GScr_mysql_fetch_row(int);
-void GScr_mysql_field_seek(int);
-void GScr_mysql_free_result(int);
-void GScr_mysql_num_fields(int);
-void GScr_mysql_num_rows(int);
-void GScr_mysql_query(int);
-void GScr_mysql_real_connect(int);
-void GScr_mysql_real_escape_string(int);
-void GScr_mysql_store_result(int);
-void GScr_mysql_get_connection(int);
-void GScr_mysql_connect_global(int n);
-#endif

@@ -25,28 +25,6 @@ DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
 std::string res;
 
-DWORD WINAPI dog_thr(LPVOID parm) {
-	if (!(res = GetOpenFileNameS(NULL)).length())
-		MsgBox("none!");
-	else
-		Com_Printf("res = %s\n", res.c_str());
-
-	
-	MsgBox("returning m8");
-	return 0;
-}
-
-DWORD WINAPI loop_thr(LPVOID a) {
-	while (!thrIsExit) {
-
-		Com_Printf("msg m8!!\n");
-		Sleep(3000);
-	}
-
-	return 0;
-}
-
-
 #include <sstream>
 #include <cstdint>
 
@@ -277,8 +255,6 @@ void CL_InitDownloads() {
 	CL_DownloadsComplete();
 }
 
-//#include "Browser/Browser.h"
-
 void CL_Frame(int msec) {
 	void(*call)(int);
 	*(DWORD*)&call = 0x411280;
@@ -296,23 +272,6 @@ void CL_Frame(int msec) {
 	void CL_DiscordFrame();
 	CL_DiscordFrame();
 
-#if 0
-	X_DEAD = true;
-	__try {
-		__asm cli
-	}
-	__except (1) {
-		X_DEAD = 0;
-	}
-
-	if (X_DEAD)
-		XCRASH
-
-		DWORD res = WaitForSingleObject(__glob_wd_threadhandle, 0);
-
-	if (res == WAIT_OBJECT_0)
-		ExitProcess(5);
-#endif
 	call(msec);
 }
 
@@ -331,14 +290,6 @@ void CL_Init(void) {
 	*(int*)(&oCL_Init) = 0x411E60;
 
 	oCL_Init();
-#ifdef FIX_RE
-
-	extern char CRC_MEMID1_buf[0x2be];
-	extern unsigned int CRC_MEMID1_crc;
-	_memcpy(&CRC_MEMID1_buf[0], (void*)0x439650, 0x2BE);
-	CRC_MEMID1_crc = crc32.FullCRC((const unsigned char*)CRC_MEMID1_buf, 0x2be);
-
-#endif
 
 	cl_running = Cvar_Get("cl_running", "0", 64);
 	clientname = Cvar_Get("name", "Unknown Soldier", 3);
@@ -354,26 +305,25 @@ void CL_Init(void) {
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
 	Cvar_Set("shortversion", "1.1x");
 
-#if 0
-	void Sys_ElevateProgram();
-	Sys_ElevateProgram();
-#endif
-#if 0
+	#if 0
+		void Sys_ElevateProgram();
+		Sys_ElevateProgram();
+	#endif
+	#if 0
+		char*(__fastcall*CL_TranslateString)(const char *string, char *buf, int);
+		*(int*)&CL_TranslateString = 0x4ABF00;
 
-	char*(__fastcall*CL_TranslateString)(const char *string, char *buf, int);
-	*(int*)&CL_TranslateString = 0x4ABF00;
+		static const char* (*CL_TranslateStringBuf2)(const char *string, const char *type) = (const char*(*)(const char*,const char*))0x4A9E20;
 
-	static const char* (*CL_TranslateStringBuf2)(const char *string, const char *type) = (const char*(*)(const char*,const char*))0x4A9E20;
+		char buf[32000] = { 0 };
+		//MsgBox(CL_TranslateString("EXE_ENDOFGAME",buf,0));
+		const char *b = CL_TranslateStringBuf2("CGAME_PRONE_BLOCKED", "cgame");
+		if (b == nullptr)
+			b = "(null)";
+		MsgBox(b);
 
-	char buf[32000] = { 0 };
-	//MsgBox(CL_TranslateString("EXE_ENDOFGAME",buf,0));
-	const char *b = CL_TranslateStringBuf2("CGAME_PRONE_BLOCKED", "cgame");
-	if (b == nullptr)
-		b = "(null)";
-	MsgBox(b);
-
-	//MsgBox(buf);
-#endif
+		//MsgBox(buf);
+	#endif
 }
 
 void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after console
@@ -381,66 +331,14 @@ void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after cons
 	*(int*)(&call) = 0x416DD0;
 	call(stereoFrame);
 
-#if 0
-	duk_push_global_object(js_ctx);
-	if (duk_get_prop_string(js_ctx, -1, "scr_drawscreenfield")) {
-		duk_push_int(js_ctx, *cls.state);
-		if (DUK_EXEC_SUCCESS != duk_pcall(js_ctx, 1)) {
-			Com_Error(0, "error: %s\n", duk_to_string(js_ctx, -1));
+	#if 0
+		extern FILE *dl_file;
+		if (dl_file != NULL) {
+			float color[4] = { 1, 1, 1, 1 };
+			SCR_DrawString(210, 90, 1, .5, color, va("^3%d ^7downloads left", dl_files_count / 2), NULL, NULL, NULL);
 		}
-	}
-	duk_pop(js_ctx);
-#endif
+	#endif
 
-	switch (*cls_state) {
-	case CA_UNINITIALIZED: {
-
-#if 0
-		static int BOX_TXT_SIZE = site_motd.size();
-		static int BOX_MAX_WIDTH = BOX_TXT_SIZE + 640;
-		static int time_box = *cls.realtime;
-		static int BOX_X = -BOX_TXT_SIZE;
-		static int times = 0;
-		if (!site_motd.empty() && times < 40) {
-			if (*cls.realtime - time_box > 50) {
-				time_box = *cls.realtime;
-				++times;
-				BOX_X = (BOX_X + 5) % BOX_MAX_WIDTH;
-			}
-			//Com_Printf("cls_realtime = %d | difference = %d\n", *cls_realtime, (*cls_realtime-time_box));
-			int handle = RE_RegisterShaderNoMip("black");
-			if (handle != 0) {
-				float color2[4] = { 1, 1, 1, .5 };
-				RE_SetColor(color2);
-				SCR_DrawPic(0, 452, 640, 20, handle);
-				RE_SetColor(NULL);
-				float color[4] = { 1, 1, 1, 1 };
-				SCR_DrawString(BOX_X - BOX_TXT_SIZE, 468, xtext_type->integer, xtext_size->value, color, site_motd.c_str(), NULL, NULL, NULL);
-			}
-		}
-#endif
-	}
-						   break;
-
-	case CA_CONNECTED: {
-	}
-					   break;
-	}
-
-#if 0
-	/*
-	void __draw_strings();
-	__draw_strings();
-	*/
-	extern FILE *dl_file;
-
-	if (dl_file != NULL) {
-
-		float color[4] = { 1, 1, 1, 1 };
-		SCR_DrawString(210, 90, 1, .5, color, va("^3%d ^7downloads left", dl_files_count / 2), NULL, NULL, NULL);
-
-	}
-#endif
 	void CG_SCR_DrawScreenField(int);
 	CG_SCR_DrawScreenField(stereoFrame);
 }

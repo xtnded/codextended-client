@@ -382,25 +382,10 @@ void RB_EndSurface(void) {
 	endsurface.Apply();
 }
 
-//#include "Browser/Browser.h"
-
 void APIENTRY qglBindTexture(GLenum target, GLuint texture) {
-
-#if 0
-	if (hook_bind) {
-		GetDefaultBrowser()->Bind();
-		hook_bind = false;
-		return;
-	}
-#endif
-
-	//fprintf(logfile, "lastshader = %s\n", lastShader->name);
-	//hook here the glbindtex
 	glBindTexture(target, texture);
 }
 
-/*void RB_BeginSurface(int shader, int fogNum);
-cHook beginsurface(0x4FF570, (int)RB_BeginSurface);*/
 void __stdcall RB_BeginSurface() {
 	shader_t* shader;
 	__asm {

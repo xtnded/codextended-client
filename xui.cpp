@@ -179,21 +179,6 @@ void xtnicon_OnClick(UIObject *o, int x, int y) {
 	o->SetFocused(false);
 }
 
-//#include "Browser/Browser.h"
-
-bool BrowserOverlay_Render(UIObject *o) {
-	if (!o->isGL)
-		return false;
-#if 0
-	Browser *GetDefaultBrowser();
-	Browser *br = GetDefaultBrowser();
-	if (br == nullptr)
-		return false;
-	RGL_DrawPic(o->x, o->y, o->width, o->height, br->GetTextureID());
-#endif
-	return false;
-}
-
 bool xtnicon_Render(UIObject *o) {
 	if (!o->isGL)
 		return false;

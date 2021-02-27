@@ -1,8 +1,6 @@
 #include "shared.h"
 #include <WinSock2.h>
 
-//extern "C" DLL_EXPORT void xtnded() {}
-
 bool apply_hooks();
 
 bool determine_cod_version();
@@ -17,30 +15,15 @@ void codextended() {
 
 
 	if (GetModuleHandleA("codextended.dll") != NULL) {
-		//MsgBox("not null!");
 		return;
 	}
 
-#if 1
 	if (!determine_cod_version()) {
 		if (!find_cod_version()) {
 			MsgBox("Failed to find Call of Duty version, please report this at http://xtnded.org");
 			return;
 		}
-		//MsgBox("Failed to detect CoD version");
 	}
-#endif
-
-	//MessageBox(NULL, va("v = %s\n", get_codversion_string()), "", 0);
-	
-#ifdef uMYSQL
-	if (codversion == CODUO_51) {
-		void mysql_test();
-		//mysql_test();
-		void scr_mysql_global_startup();
-		scr_mysql_global_startup();
-	}
-#endif
 
 #ifdef ENABLE_CODX
 	if (!apply_hooks()) {
@@ -51,5 +34,4 @@ void codextended() {
 #endif
 }
 
-void codextended_unload() {
-}
+void codextended_unload() {}

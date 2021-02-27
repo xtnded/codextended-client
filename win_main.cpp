@@ -229,30 +229,11 @@ void Sys_Unload() {
 		return;
 	unloaded = true;
 
-	//void DestroyDefaultBrowser();
-	//DestroyDefaultBrowser();
-
 	void CleanupThreads();
 	CleanupThreads();
-	//MsgBox("cleant up threads");
-
-#ifdef uMYSQL
-	if (codversion == CODUO_51) {
-		void scr_mysql_global_cleanup();
-		scr_mysql_global_cleanup();
-	}
-#endif
 
 	void XUI_Destroy();
 	XUI_Destroy();
-	//MsgBox("XUI_DESTROYED");
-
-#if 0
-#ifdef DEBUG
-	_CrtDumpMemoryLeaks();
-	CloseHandle(hLogFile);
-#endif
-#endif
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
@@ -273,31 +254,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	SendMessage(g_Dialog, WM_CLOSE, 0, 0);
-
-#if 0
-	while (g_Dialog != nullptr || WaitForSingleObject(thr->handle, 100) != WAIT_OBJECT_0) {
-		//GetExitCodeThread(thr->handle, &exitCode);
-
-		SendDlgItemMessage(g_Dialog, IDC_PROGRESS1, PBM_SETSTEP, 1, 0);
-		int cur = SendDlgItemMessageA(g_Dialog, IDC_PROGRESS1, PBM_STEPIT, 0, 0);
-
-		if (cur >= 100) {
-			ShowWindow(g_Dialog, SW_HIDE);
-			//MsgBox("cur >= 100");
-			break;
-		}
-
-		Sleep(100);
-	}
-#endif
 	CleanupThreads();
 	return 0;
-
-
 #else
-	
-	
-	
 	if (strstr(lpCmdLine, "steamchild") != NULL) {
 		return 0;
 	}
