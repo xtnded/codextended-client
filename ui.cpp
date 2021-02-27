@@ -462,7 +462,10 @@ void UI_Init(DWORD base) {
 	//__call(UI_FILE_OFF(0x400076ED), (int)_UI_MouseEvent);
 	__call(UI_FILE_OFF(0x400076BE), (int)_UI_Init);
 
-	__call(UI_FILE_OFF(0x4000774E), (int)UI_DrawConnectScreen);
+	cvar_t* xui_connect = Cvar_Get("cg_xui_connect", "0", CVAR_ARCHIVE);
+	if (xui_connect->integer) {
+		__call(UI_FILE_OFF(0x4000774E), (int)UI_DrawConnectScreen);
+	}
 
 	*(BYTE*)UI_FILE_OFF(0x40007BD1) = 0xeb; //jle > jmp for drawing cursor
 

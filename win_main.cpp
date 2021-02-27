@@ -234,6 +234,9 @@ void Sys_Unload() {
 
 	void XUI_Destroy();
 	XUI_Destroy();
+
+	void CL_DiscordShutdown();
+	CL_DiscordShutdown();
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {

@@ -133,10 +133,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\mysql-connector-c-6.1.6-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
+      <DelayLoadDLLs></DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -158,7 +158,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEXTENDED_PROJ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\mysql-connector-c-6.1.6-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/D "CURL_STATICLIB" /D "XTNDED_DEV" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -166,10 +166,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\mysql-connector-c-6.1.6-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <AdditionalOptions>/DEF:lib_export.def /delayload:awesomium.dll %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
+      <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
+      <DelayLoadDLLs></DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -191,7 +191,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEXTENDED_PROJ_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\mysql-connector-c-6.1.6-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/D "CURL_STATICLIB" /D "PROJECT_EXE" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -199,10 +199,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\mysql-connector-c-6.1.6-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs>libmysql.dll</DelayLoadDLLs>
+      <DelayLoadDLLs></DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
