@@ -4,7 +4,6 @@
 #include "Shlwapi.h"
 #include "Shellapi.h"
 #include "resource.h"
-#include "steam.h"
 
 static int(__stdcall *main)(HINSTANCE, HINSTANCE, LPSTR, int) = (int(__stdcall*)(HINSTANCE, HINSTANCE, LPSTR, int))0x4640B0;
 
@@ -244,12 +243,6 @@ void Sys_Unload() {
 	}
 #endif
 
-	if (cSteamClient != nullptr) {
-		delete cSteamClient;
-		cSteamClient = nullptr;
-	}
-	//MsgBox("csteamclient deleted");
-
 	void XUI_Destroy();
 	XUI_Destroy();
 	//MsgBox("XUI_DESTROYED");
@@ -308,60 +301,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (strstr(lpCmdLine, "steamchild") != NULL) {
 		return 0;
 	}
-#ifdef XTNDED_DEV
-	char *cmd;
-
-	for (BYTE i = 0; i < __argc; i++) {
-		cmd = __argv[i];
-		if (!strlen(cmd))
-			continue;
-
-		if(!strcmp(cmd, "-name")) {
-			if(__argc - 1 == i)
-				continue;
-			char *name = __argv[++i];
-			Com_sprintf(PRODUCT_DISPLAY_NAME_BUF, sizeof(PRODUCT_DISPLAY_NAME_BUF), "%s", name);
-
-		} else if (!strcmp(cmd, "-nullclient")) {
-			bNullClient = true;
-
-		}
-		else if (!strcmp(cmd, "-dev")) {
-			bDeveloper = true;
-		}
-	}
-
-	if (bNullClient) {
-		printf("steam loading...\n");
-
-		cSteamClient = new CSteamClient();
-
-		if (SteamClient() != nullptr) {
-			printf("not nullptr\n");
-
-			for (int k = 0; k < SteamFriends()->GetFriendCount(k_EFriendFlagAll); k++) {
-				CSteamID friendID = SteamFriends()->GetFriendByIndex(k, k_EFriendFlagAll);
-
-				const char *sFriendName = SteamFriends()->GetFriendPersonaName(friendID);
-
-				if (strstr(sFriendName, "Laugh") || strstr(sFriendName, "nope")) {
-					//SteamFriends()->InviteUserToGame(friendID, "top kek");
-					break;
-
-				}
-			}
-		}
-
-		while (1) {
-
-			if (GetAsyncKeyState(VK_LCONTROL)) {
-				printf("Exiting!\n");
-				return 0;
-			}
-
-		}
-	}
-#endif
 
 	if (Sys_GetAppDataFolder(szAppData, MAX_PATH, true) == NULL) {
 		MsgBox("Failed to create data folder.");

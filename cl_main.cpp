@@ -1,7 +1,6 @@
 #include "shared.h"
 #include "client.h"
 #include "render.h"
-#include "steam.h"
 #include "version_info.h"
 #include "dl_public.h"
 
@@ -21,34 +20,6 @@ cvar_t *cl_findshader;
 cvar_t *cl_font_type;
 cvar_t *cg_drawheadnames;
 cvar_t *cg_xui_scoreboard;
-
-#define STEAM_CLOUD_FILENAME "data"
-
-void _steam_set() {
-	if (Cmd_Argc() != 2) {
-		Com_Printf("noob\n");
-		return;
-	}
-
-	char *msg = Cmd_Argv(1);
-	SteamRemoteStorage()->FileWrite(STEAM_CLOUD_FILENAME, msg, strlen(msg) + 1);
-
-}
-void _steam_get() {
-	char buf[1024] = { 0 };
-	if (!SteamRemoteStorage()->FileExists(STEAM_CLOUD_FILENAME)) {
-		Com_Printf("^1no file!\n");
-		return;
-	}
-	int32 fs = SteamRemoteStorage()->GetFileSize(STEAM_CLOUD_FILENAME);
-	if (fs >= sizeof(buf)) {
-		Com_Printf("too large\n");
-		return;
-	}
-	int32 read_size = SteamRemoteStorage()->FileRead(STEAM_CLOUD_FILENAME, buf, sizeof(buf) - 1);
-	buf[read_size] = '\0';
-	Com_Printf("data = %s\n", buf);
-}
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
@@ -124,157 +95,6 @@ public:
 		return m_buffer.str();
 	}
 };
-
-void list_dll() {
-
-	return;
-#if 1
-	/* experimental half working steam stuff */
-	HMODULE hsteamclient = GetModuleHandleA("steamclient.dll");
-
-#define STEAM_OFF(x) ((int)hsteamclient + (x - 0x38000000))
-
-	if (hsteamclient != NULL) {
-
-		Com_Printf("steam client present!\n");
-		
-#if 0
-		int returnCode;
-
-		void*(*SteamAPI_CreateInterface)(const char*, int*);
-		*(uint32_t*)&SteamAPI_CreateInterface = (uint32_t)GetProcAddress(hsteamclient, "CreateInterface");
-
-		if (!SteamAPI_CreateInterface) {
-			Com_Printf("createinterface not found\n");
-			return;
-		}
-
-		void *InterfaceSteamShortcuts = SteamAPI_CreateInterface("CLIENTSHORTCUTS_INTERFACE_VERSION001", &returnCode);
-		Com_Printf("returncode = %d, interface steam shortcuts = %02X\n", returnCode, (uint32_t)InterfaceSteamShortcuts);
-#endif
-
-		UINT32(*GetSteamFunc)(const char*, const char*);
-		*(UINT32*)&GetSteamFunc = STEAM_OFF(0x38254E70);
-
-		UINT32 found, appID;
-		
-
-		//found = GetSteamFunc("IClientShortcuts", "GetUniqueLocalAppId");
-#if 0
-		found = GetSteamFunc("IClientShortcuts", "GetUniqueLocalAppId");
-
-		uint32_t(*GetUniqueLocalAppId)();
-		*(int*)&GetUniqueLocalAppId = found;
-
-		if (!found) {
-			Com_Printf("not found error\n");
-			return;
-		}
-		//appID = GetUniqueLocalAppId();
-#endif
-		appID = STEAM_APPID;
-
-		found = GetSteamFunc("IClientApps", "SetLocalAppConfig"); //found so far
-
-		Com_Printf("found = %02X\n", found);
-
-		int parentAppId = STEAM_APPID;
-#if 1
-		if (!SteamApps()->BIsSubscribedApp(parentAppId))
-			parentAppId = 218;
-#endif
-
-		// create a fake app to hold our gameid
-		uint64_t gameID = 0xA18F2DAB01000000 | parentAppId; // crc32 for 'kekking' + mod
-
-		// create the keyvalues string for the app
-		KeyValuesBuilder builder;
-		builder.PackString("name", "i like penguins");
-		builder.PackUint64("gameid", gameID);
-		builder.PackString("installed", "1");
-		builder.PackString("gamedir", "kekking");
-		builder.PackString("serverbrowsername", "lovely!");
-		builder.PackEnd();
-
-		std::string str = builder.GetString();
-
-		bool(*SetLocalAppConfig)(uint32_t, const char*, uint32_t);
-		*(UINT32*)&SetLocalAppConfig = found;
-
-		bool result;
-		for (uint32_t i = 0; i < UINT32_MAX; i++)
-		result = SetLocalAppConfig(i, str.c_str(), (uint32_t)str.size());
-		//bool configAdded = steamAppsInterface.Invoke<bool>("SetLocalAppConfig", appID, str.c_str(), (uint32_t)str.size());
-		if (result) {
-			Com_Printf("configAdded\n");
-		}
-		else {
-			Com_Printf("not added\n");
-		}
-	}
-	return;
-#endif
-		char xn[MAX_PATH];
-		char modname[MAX_PATH];
-		HMODULE mods[1024];
-		HANDLE proc = GetCurrentProcess();
-		DWORD cbNeeded;
-		unsigned int i;
-		if (EnumProcessModules(proc, mods, sizeof(mods), &cbNeeded)) {
-			for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
-				if (GetModuleFileNameEx(proc, mods[i], modname, sizeof(modname) / sizeof(char))) {
-					//Com_Printf("^3%s\n", modname);
-
-					if (strstr(modname, "xfire_toucan")) {
-
-
-						int(*ToucanGetBuildNumber)() = NULL;
-						HMODULE hModule = GetModuleHandleA(modname);
-						if (hModule != NULL) {
-							ToucanGetBuildNumber = (int(*)())GetProcAddress(hModule, "ToucanGetBuildNumber");
-
-
-							if (ToucanGetBuildNumber != NULL) {
-								Com_Printf("build num = %d\n", ToucanGetBuildNumber());
-							}
-						}
-					}
-				}
-			}
-		}
-
-		threadInfo_t ti;
-		ti.key = "open_file_thread";
-		ti.handle = (HANDLE)CreateThread(0, 0, dog_thr, 0, 0, &ti.id);
-		threadsinfo.push_back(ti);
-}
-
-#if 0
-
-void istate() {
-	FriendGameInfo_t fgi;
-	CSteamID fid;
-	int iFriendFlags = k_EFriendFlagAll;
-	size_t friend_count = SteamFriends()->GetFriendCount(iFriendFlags);
-	for (size_t i = 0; i < friend_count; i++) {
-		fid = SteamFriends()->GetFriendByIndex(i, iFriendFlags);
-		//SteamUser()->UserHasLicenseForApp(SteamUser()->GetSteamID(), );
-
-		const char *friend_name = SteamFriends()->GetFriendPersonaName(fid);
-
-		if (strstr(friend_name, "iState") != NULL) {
-			//Com_Printf("Friend (%s) is in game %d and ^2%d\n", SteamFriends()->GetFriendPersonaName(fid), fgi.m_gameID, (SteamUser()->UserHasLicenseForApp(fid, STEAM_APPID) == k_EUserHasLicenseResultHasLicense) ? 1 : 0);
-			if (SteamUser()->UserHasLicenseForApp(fid, STEAM_COD1_APPID) == k_EUserHasLicenseResultHasLicense) {
-				Com_Printf("%s heeft CoD1 op steam\n", friend_name);
-			}
-			else
-				Com_Printf("%s heeft cod1 niet hijs een noob\n", friend_name);
-		}
-
-	}
-}
-
-#endif
 
 void CL_Connect_f() {
 	void(*o)() = (void(*)())0x40F6A0;
@@ -466,34 +286,8 @@ void CL_Frame(int msec) {
 	if (!cl_running->integer)
 		return;
 	
-#if 0
-	Browser *br = GetDefaultBrowser();
-	if(br!=nullptr)
-	br->Update();
-#endif
-	
 	void Enc_SendHeartbeat();
 	Enc_SendHeartbeat();
-
-	if (bSteamAvailable) {
-		cSteamClient->RunFrame();
-
-		if (*Cvar_VariableString("cl_ingame") == '1' && *cls_servername) {
-			qboolean    NET_CompareAdr(netadr_t a, netadr_t b);
-			netadr_t serverAddress = *clc_serverAddress;
-			if (cSteamClient->bIsAdvertisingServer || !NET_CompareAdr(cSteamClient->advertisedServer, serverAddress)) {
-				SteamUser()->AdvertiseGame(k_steamIDNonSteamGS, ntohl(serverAddress._ip), ntohs(serverAddress.port));
-				cSteamClient->advertisedServer = serverAddress;
-				cSteamClient->bIsAdvertisingServer = true;
-			}
-		}
-		else {
-			if (cSteamClient->bIsAdvertisingServer) {
-				cSteamClient->bIsAdvertisingServer = false;
-				SteamUser()->AdvertiseGame(k_steamIDNil, 0, 0);
-			}
-		}
-	}
 
 	if (clc_bWWWDl)
 		CL_WWWDownload();
@@ -523,47 +317,6 @@ void CL_Frame(int msec) {
 }
 
 int *whiteShader = (int*)0x15CA630;
-
-void Steam_Invite() {
-	void(*Cbuf_ExecuteText)(const char*);
-	*(UINT32*)&Cbuf_ExecuteText = 0x428A80;
-
-	if (!bSteamAvailable) {
-		Com_Printf("Steam not loaded.\n");
-		return;
-	}
-
-	if (Cmd_Argc() < 3) {
-		Com_Printf("usage: %s <substr name> <server ip>\n", Cmd_Argv(0));
-		return;
-	}
-	char *substr = Cmd_Argv(1);
-	char *server = Cmd_Argv(2);
-
-	for (int i = 0; i < SteamFriends()->GetFriendCount(k_EFriendFlagAll); i++) {
-		CSteamID friendID = SteamFriends()->GetFriendByIndex(i, k_EFriendFlagAll);
-
-		if (!friendID.IsValid())
-			continue;
-
-		const char *sFriendName = SteamFriends()->GetFriendPersonaName(friendID);
-
-		if (!sFriendName || !*sFriendName)
-			continue;
-
-
-		FriendGameInfo_t fgi;
-		if (strstr(sFriendName, substr) != NULL) {
-
-			if (SteamFriends()->GetFriendGamePlayed(friendID, &fgi)) {
-				SteamFriends()->InviteUserToGame(friendID, server);
-				Com_Printf("Invited %s", SteamFriends()->GetFriendPersonaName(friendID));
-			}
-			break;
-		}
-	}
-
-}
 
 void CL_Init(void) {
 
@@ -621,59 +374,7 @@ void CL_Init(void) {
 
 	//MsgBox(buf);
 #endif
-
-#if 1
-	if (cSteamClient == nullptr)
-		cSteamClient = new CSteamClient();
-#endif
-
-#if 0
-	if (bSteamAvailable) {
-		void print_steam_info();
-		Cmd_AddCommand("steam", print_steam_info);
-		Cmd_AddCommand("steam_set", _steam_set);
-		Cmd_AddCommand("steam_get", _steam_get);
-		Cvar_Set("name", (char*)SteamFriends()->GetPersonaName());
-		Cmd_AddCommand("invite", Steam_Invite);
-		Cmd_AddCommand("dll", list_dll);
-	}
-#endif
 }
-
-#ifdef STEAM_SUPPORT
-void print_steam_info() {
-
-	CSteamID id = SteamUser()->GetSteamID();
-
-
-	Com_Printf("steamid = %lu\n", id);
-
-	Com_Printf("^3hello %s\n", SteamFriends()->GetPersonaName());
-
-	Com_Printf("steam level = %d\n", SteamUser()->GetPlayerSteamLevel());
-
-	CSteamID st_id = SteamUser()->GetSteamID();
-	//SteamUser()->AdvertiseGame(st_id, 1, 28960);
-	//SteamMatchmaking()->CreateLobby(k_ELobbyTypeFriendsOnly,)
-
-	FriendGameInfo_t fgi;
-	CSteamID fid;
-	int iFriendFlags = k_EFriendFlagAll;
-	size_t friend_count = SteamFriends()->GetFriendCount(iFriendFlags);
-	for (size_t i = 0; i < friend_count; i++) {
-		fid = SteamFriends()->GetFriendByIndex(i, iFriendFlags);
-		//SteamUser()->UserHasLicenseForApp(SteamUser()->GetSteamID(), );
-
-		if (SteamFriends()->GetFriendGamePlayed(fid, &fgi)) {
-
-			Com_Printf("Friend (%s) is in game %d and ^2%d\n", SteamFriends()->GetFriendPersonaName(fid), fgi.m_gameID, (SteamUser()->UserHasLicenseForApp(fid, STEAM_APPID) == k_EUserHasLicenseResultHasLicense) ? 1 : 0);
-
-		}
-
-	}
-
-}
-#endif
 
 void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after console
 	void(*call)(stereoFrame_t);

@@ -1,5 +1,4 @@
 #include "shared.h"
-#include "steam.h"
 #include "gl/gl.h"
 
 #pragma comment(lib, "detours.lib")

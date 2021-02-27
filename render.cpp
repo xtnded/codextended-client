@@ -1,7 +1,6 @@
 #include "shared.h"
 #include "client.h"
 #include "render.h"
-#include "steam.h"
 
 RE_RegisterShaderNoMip_t RE_RegisterShaderNoMip = (RE_RegisterShaderNoMip_t)0x4FCAE0;
 RE_RegisterShader_t RE_RegisterShader = (RE_RegisterShader_t)0x4FCA80;
@@ -15,79 +14,6 @@ SCR_DrawSmallChar_t SCR_DrawSmallChar = (SCR_DrawSmallChar_t)0x416980;
 SCR_DrawString_t SCR_DrawString = (SCR_DrawString_t)0x4DF570;
 RE_SetColor_t RE_SetColor = (RE_SetColor_t)0x4DDCF0;
 RB_SetGL2D_t RB_SetGL2D = (RB_SetGL2D_t)0x4D6CB0;
-
-/* steam related */
-
-SteamAvatar localSteamAvatar;
-std::vector<SteamAvatar> SteamAvatars;
-
-void SteamAvatar::Delete() {
-	if (textureID && loaded) {
-		glDeleteTextures(1, &textureID);
-		loaded = false;
-	}
-}
-
-void SteamAvatar::Bind() {
-	glBindTexture(GL_TEXTURE_2D, textureID);
-}
-
-void SteamAvatar::Render2DQuad(float x, float y, float w, float h) {
-	if (!bSteamAvailable || !this->loaded)
-		return;
-	RGL_DrawPic(x, y, w, h, this->textureID);
-}
-
-bool SteamAvatar::Load(CSteamID cid) {
-	bool ret = false;
-
-	if (!bSteamAvailable)
-		return ret;
-
-	if (!cid.IsValid())
-		return ret;
-
-	if (SteamFriends()->RequestUserInformation(cid, false))
-		return ret; //it's being requested
-
-	this->steamID = cid;
-
-	int image = SteamFriends()->GetSmallFriendAvatar(cid);
-	if (-1 != image) {
-		if (SteamUtils()->GetImageSize(image, &this->width, &this->height)) {
-			if (this->width && this->height) {
-				BYTE *rgba = new BYTE[this->width * this->height * 4];
-				if (SteamUtils()->GetImageRGBA(image, (uint8*)rgba, this->width * this->height * 4)) {
-					glEnable(GL_TEXTURE_2D);
-					glGenTextures(1, &this->textureID);
-					glBindTexture(GL_TEXTURE_2D, this->textureID);
-
-					/*
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0);
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-					*/
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					/*
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-					*/
-
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void *)rgba);
-					//glDisable(GL_TEXTURE_2D);
-					if (glGetError() != GL_NO_ERROR) {
-						MessageBox(NULL, va("%d (0x%x)", glGetError(), glGetError()), __TITLE, MB_OK);
-					}
-					ret = true;
-					loaded = ret;
-				}
-				delete[] rgba;
-			}
-		}
-	}
-	return ret;
-}
-/* end of steam related */
 
 /* FONTS */
 
@@ -267,14 +193,10 @@ void* ri_Hunk_AllocAlign(int size) {
 
 void InitRender() {
 	GenerateFonts();
-	if (bSteamAvailable)
-		localSteamAvatar.Load(SteamUser()->GetSteamID());
 }
 
 void DestroyRender() {
 	DestroyFonts();
-	if (bSteamAvailable)
-		localSteamAvatar.Delete();
 }
 
 void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba) {

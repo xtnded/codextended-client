@@ -1,5 +1,4 @@
 #include "shared.h"
-#include "steam.h"
 #include <WinSock2.h>
 
 //extern "C" DLL_EXPORT void xtnded() {}

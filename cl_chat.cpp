@@ -97,12 +97,8 @@ bool xui_txt_box_OnEnter(UITextbox *o) {
 }
 
 void CM_CreateWindow(UIMenu *m) {
-	int X_POS = 0;
+	int X_POS = 105;
 	int X_WIDTH = 640;
-	extern bool bSteamAvailable;
-	if (!bSteamAvailable) {
-		X_POS = 105;
-	}
 	gwindow = xui->createMenuItem<UIGlobalChatMessageWindow>(m, X_POS, 0, X_WIDTH, 430);
 	UITextbox *txt_box = xui->createMenuItem<UITextbox>(m, X_POS, 440, 200, 30);
 	txt_box->SetBackgroundColor(.7, .7, .7, 1);

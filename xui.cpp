@@ -2,7 +2,6 @@
 #include "render.h"
 #include "client.h"
 #include "stockmapinfo.h"
-#include "steam.h"
 
 int stockMapLoadScreenShaders[STOCK_MAP_COUNT];
 
@@ -170,115 +169,6 @@ void UIMenu::OnKeyEvent(int key, int x, int y) {
 	}
 }
 
-const static char *Steam_GetPersonaStateString(EPersonaState state) {
-	switch (state) {
-	case k_EPersonaStateAway:
-		return "Away";
-	case k_EPersonaStateOffline:
-		return "^1Offline";
-	case k_EPersonaStateOnline:
-		return "^2Online";
-	case k_EPersonaStateBusy:
-		return "Busy";
-	case k_EPersonaStateSnooze:
-		return "Away from keyboard";
-	case k_EPersonaStateLookingToTrade:
-		return "Looking to trade";
-	case k_EPersonaStateLookingToPlay:
-		return "Looking to play";
-	}
-	return "^1Offline";
-}
-
-class UISteamFriendsFeeder : public UIFeeder {
-public:
-	CSteamID s_Friend;
-	UISteamFriendsFeeder(int a, int b, int c, int d) : UIFeeder(a, b, c, d) {
-		classType = UIOT_STEAMFRIENDSFEEDER;
-	}
-
-	unsigned int getStep() {
-		return 2;
-	}
-
-	unsigned int getSize() {
-		int iFriendFlags = k_EFriendFlagAll;
-#if 0
-		int online = 0;
-		for (int i = 0; i < SteamFriends()->GetFriendCount(k_EFriendFlagAll); i++) {
-			if (SteamFriends()->GetFriendPersonaState(SteamFriends()->GetFriendByIndex(i, k_EFriendFlagAll)) == k_EPersonaStateOffline)
-				continue;
-			++online;
-		}
-		return online;
-#endif
-		return SteamFriends()->GetFriendCount(iFriendFlags);
-	}
-
-	void Render() {
-
-#define fontHeight SMALLCHAR_HEIGHT
-
-		int drawIndex = 0;
-
-		vec4_t colBlack = { 0, 0, 0, .5 };
-
-		RE_SetColor(colBlack);
-		SCR_DrawPic(x, y, width, height, *whiteShader);
-		RE_SetColor(NULL);
-
-		int friendFlag = k_EFriendFlagAll;
-
-		int num_friends = SteamFriends()->GetFriendCount(friendFlag);
-
-		float blue_overlay_color[] = { 0, .3, 1, .6 };
-		int tX = x, tY = y, friendNameLen;
-		char *friendName;
-
-		bool f = false;
-
-		for (int i = this->scrollAmount; i < cSteamClient->m_SteamFriends.size(); i++) {
-			CSteamID fID = cSteamClient->m_SteamFriends[i];
-			if (tY >(y + height)) {
-				break;
-			}
-
-			friendName = (char*)SteamFriends()->GetFriendPersonaName(fID);
-			friendNameLen = strlen(friendName) * fontHeight;
-
-			if (keys[K_MOUSE1].down &&
-				ui_cursor->x > tX && ui_cursor->x < tX + width
-				&& ui_cursor->y > tY && ui_cursor->y < tY + (fontHeight)) {
-				//Com_Printf("selected %s\n", p_name);
-				Cvar_Set("steam_selectedid", va("%s", friendName));
-				s_Friend = fID;
-			}
-			if (s_Friend == fID) {
-				f = true;
-				RE_SetColor(blue_overlay_color);
-				SCR_DrawPic(tX, tY, width, fontHeight, *whiteShader);
-				RE_SetColor(NULL);
-			}
-			RE_SetColor(vColorWhite);
-			SCR_DrawString(tX, tY + SMALLCHAR_HEIGHT - 4, 1, SMALLCHAR_SCALE, vColorWhite, friendName, NULL, NULL, NULL);
-			
-			FriendGameInfo_t self_gi;
-			FriendGameInfo_t fgi;
-			if(SteamFriends()->GetFriendGamePlayed(SteamUser()->GetSteamID(), &self_gi) && SteamFriends()->GetFriendGamePlayed(fID, &fgi) && fgi.m_gameID == self_gi.m_gameID)
-				SCR_DrawString(tX, tY + SMALLCHAR_HEIGHT * 2 - 4, 1, 0.3, vColorWhite, "^2In-game", NULL, NULL, NULL);
-			else
-				SCR_DrawString(tX, tY + SMALLCHAR_HEIGHT * 2 - 4, 1, 0.2, vColorWhite, (char*)Steam_GetPersonaStateString(SteamFriends()->GetFriendPersonaState(fID)), NULL, NULL, NULL);
-			RE_SetColor(NULL);
-			++drawIndex;
-			tY += fontHeight * 2;
-		}
-		if (!f)
-			s_Friend.Clear();
-	}
-};
-
-UISteamFriendsFeeder *xui_steamfriendsfeeder = nullptr;
-
 void xtnicon_OnClick(UIObject *o, int x, int y) {
 	if (xuim_overlay != nullptr) {
 		if (!xuim_overlay->IsOpen())
@@ -309,117 +199,26 @@ bool xtnicon_Render(UIObject *o) {
 		return false;
 	extern XTexture textureIcon;
 
-	if (!bSteamAvailable)
-		RGL_DrawPic(o->x, o->y, o->width, o->height, textureIcon.textureID);
-	else
-		localSteamAvatar.Render2DQuad(o->x, o->y, o->width, o->height);
+	RGL_DrawPic(o->x, o->y, o->width, o->height, textureIcon.textureID);
 	return false;
 }
 
-bool xui_cond_steam(UIObject *o) {
-	if (ui_cursor == nullptr)
-		return false;
-	if (!bSteamAvailable)
-		return false;
-	return true;
-}
-
-bool xui_cond_steam_ingame(UIObject *o) {
-	if (ui_cursor == nullptr)
-		return false;
-	if (!bSteamAvailable)
-		return false;
-	if (!*cls_servername)
-		return false;
-	return true;
-}
-
-void xui_stm_invite_btn_OnClick(UIObject *o, int x, int y) {
-	CSteamID fID = xui_steamfriendsfeeder->s_Friend;
-	if (!fID.IsValid())
-		return;
-	SteamFriends()->InviteUserToGame(fID, cls_servername);
-	xuim_overlay->Close();
-}
-
-void xui_stm_join_btn_OnClick(UIObject *o, int x, int y) {
-	CSteamID fID = xui_steamfriendsfeeder->s_Friend;
-	if (!fID.IsValid())
-		return;
-
-	void(*Cbuf_ExecuteText)(const char*);
-	*(UINT32*)&Cbuf_ExecuteText = 0x428A80;
-	
-	FriendGameInfo_t fgi, self_gi;
-	netadr_t adr;
-	if (SteamFriends()->GetFriendGamePlayed(SteamUser()->GetSteamID(), &self_gi) && SteamFriends()->GetFriendGamePlayed(fID, &fgi) && fgi.m_gameID == self_gi.m_gameID) {
-		adr.type = NA_IP;
-		adr._ip = ntohl(fgi.m_unGameIP);
-		adr.port = ntohs(fgi.m_usGamePort);
-
-		const char *serverip = NET_AdrToString(adr);
-
-		Cbuf_ExecuteText(va("connect %s", serverip));
-		xuim_overlay->Close();
-	}
-}
-
 bool xui_createmainoverlay() {
-#if 1
-	UIMenu *om = xui->createMenu(0, 0, 640, 480);
-	om->name = "xui_quickicon";
-	om->isGL = true;
-	om->showOnCvar("xui_quickicon", 1);
-	om->SetBackgroundColor(0, 0, 0, 0);
-	om->SetVisible(true);
+	#if 0
+		UIMenu *om = xui->createMenu(0, 0, 640, 480);
+		om->name = "xui_quickicon";
+		om->isGL = true;
+		om->showOnCvar("xui_quickicon", 1);
+		om->SetBackgroundColor(0, 0, 0, 0);
+		om->SetVisible(true);
 
-#define xtnicon_size 16
-	UIObject *xtnicon = xui->createMenuItem<UIObject>(om, 640 - xtnicon_size - 5, 5, xtnicon_size, xtnicon_size);
-	xtnicon->visible = true;
-	xtnicon->isGL = true;
-	xtnicon->m_Render = xtnicon_Render;
-	xtnicon->m_OnClick = xtnicon_OnClick;
-#endif
-
-	/* create browser */
-	//Browser *br = CreateDefaultBrowser();
-#if 0
-	UIObject *bo = xui->createMenuItem<UIObject>(om, 0, 0, 640, 480);
-	bo->visible = true;
-	bo->isGL = true;
-	bo->m_Render = BrowserOverlay_Render;
-#endif
-
-	UIMenu *m = xui->createMenu(0, 0, 640, 480);
-	m->name = "xuim_overlay";
-	m->SetBackgroundColor(0, 0, 0, .5);
-	m->SetVisible(false);
-	xuim_overlay = m;
-
-	void CM_CreateWindow(UIMenu*);
-	CM_CreateWindow(m);
-
-	UIClientFeeder *feeder = xui->createMenuItem<UIClientFeeder>(m, 540, 0, 100, 480);
-	xui_steamfriendsfeeder = xui->createMenuItem<UISteamFriendsFeeder>(m, 0, 0, 100, 640);
-	xui_steamfriendsfeeder->m_Condition = xui_cond_steam;
-
-	UIObject *stm_invite_btn = xui->createMenuItem<UIObject>(m, 310, 440, 100, 100);
-	stm_invite_btn->SetBackgroundColor(1,1,1, 1);
-	stm_invite_btn->SetText("Invite Friend");
-	stm_invite_btn->m_OnClick = xui_stm_invite_btn_OnClick;
-	stm_invite_btn->m_Condition = xui_cond_steam_ingame;
-
-	UIObject *stm_join_btn = xui->createMenuItem<UIObject>(m, 400, 440, 100, 100);
-		      stm_join_btn->SetBackgroundColor(1, 1, 1, 1);
-		      stm_join_btn->SetText("Join Friend");
-		      stm_join_btn->m_OnClick = xui_stm_join_btn_OnClick;
-		      stm_join_btn->m_Condition = xui_cond_steam;
-
-#if 0
-	UIObject *o1 = xui->createMenuItem<UIObject>(m, 100, 100, 100, 100);
-	o1->SetText("codextended overlay click on the icon at right top or press SHIFT + SPACE to toggle");
-	o1->SetBackgroundColor(1, 1, 1, 1);
-#endif
+		#define xtnicon_size 16
+		UIObject *xtnicon = xui->createMenuItem<UIObject>(om, 640 - xtnicon_size - 5, 5, xtnicon_size, xtnicon_size);
+		xtnicon->visible = true;
+		xtnicon->isGL = true;
+		xtnicon->m_Render = xtnicon_Render;
+		xtnicon->m_OnClick = xtnicon_OnClick;
+	#endif
 
 	return true;
 }
