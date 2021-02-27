@@ -703,8 +703,8 @@ void CG_Init(DWORD base) {
 	__call(CGAME_OFF(0x3000C893), (int)pm_aimflag);
 	CG_PlayerSprites = (void(*)())CGAME_OFF(0x300274D0);
 
-	*(UINT32*)CGAME_OFF(0x300749EC) = 1; //cg_fov from 513 > 1 without cheat flag
-	*(UINT32*)CGAME_OFF(0x30074EBC) = 0; //cg_thirdperson
+	// *(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov / FIX: Allow this but find a way to limit fov in a certain range.
+	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
 
 	void CG_SetHeadNames(int flag);
 	CG_SetHeadNames(cg_drawheadnames->integer);
