@@ -99,9 +99,14 @@ bool apply_hooks() {
 
 	//0041627B 10C                 call    sub_410240
 	//__call(0x41627B, (int)CL_InitDownloads);
-	void CL_NextDownload();
-	//__call(0x410316, (int)CL_NextDownload);
-	__jmp(0x410190, (int)CL_NextDownload);
+	void X_CL_NextDownload();
+	//void CL_NextDownload();
+	//void CL_BeginDownload(const char *localName, const char *remoteName);
+	__call(0x410316, (int)X_CL_NextDownload);
+	__call(0x410376, (int)X_CL_NextDownload);
+	__call(0x41656C, (int)X_CL_NextDownload);
+	//__jmp(0x410190, (int)CL_NextDownload);
+	//__jmp(0x4100D0, (int)CL_BeginDownload);
 
 	void CL_Frame(int msec);
 	__call(0x43822C, (int)CL_Frame);
