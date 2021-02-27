@@ -440,6 +440,14 @@ void UI_DrawConnectScreen(int overlay) {
 	}
 }
 
+void UI_StartServerRefresh(qboolean full) {
+	if (*((bool*)0x401EA698)) return;
+
+	void(*o)(qboolean);
+	*(int*)&o = UI_FILE_OFF(0x4000EA90);
+	o(full);
+}
+
 void UI_Init(DWORD base) {
 	ui_mp = base;
 	isUIRunning = true;
@@ -461,6 +469,8 @@ void UI_Init(DWORD base) {
 	__jmp(UI_FILE_OFF(0x4000A5F0), (int)UI_RunMenuScript);
 	//__call(UI_FILE_OFF(0x400076ED), (int)_UI_MouseEvent);
 	__call(UI_FILE_OFF(0x400076BE), (int)_UI_Init);
+
+	__call(UI_FILE_OFF(0x4000AA55), (int)UI_StartServerRefresh);
 
 	cvar_t* xui_connect = Cvar_Get("cg_xui_connect", "0", CVAR_ARCHIVE);
 	if (xui_connect->integer) {
