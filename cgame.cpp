@@ -682,6 +682,15 @@ void CG_SCR_DrawScreenField(int stereoFrame) {
 	}
 }
 
+void CG_DrawDisconnect() {
+	cvar_t* xui_interrupted = Cvar_Get("cg_xui_interrupted", "0", CVAR_ARCHIVE);
+	if (xui_interrupted->integer) {
+		void(*call)();
+		*(int*)&call = CGAME_OFF(0x30015450);
+		call();
+	}
+}
+
 void CG_Init(DWORD base) {
 	cgame_mp = base;
 	CG_ServerCommand = (CG_ServerCommand_t)(cgame_mp + 0x2E0D0);
@@ -702,6 +711,9 @@ void CG_Init(DWORD base) {
 	__call(CGAME_OFF(0x3000C858), (int)pm_aimflag);
 	__call(CGAME_OFF(0x3000C893), (int)pm_aimflag);
 	CG_PlayerSprites = (void(*)())CGAME_OFF(0x300274D0);
+
+	__call(CGAME_OFF(0x300159CC), (int)CG_DrawDisconnect);
+	__call(CGAME_OFF(0x300159D4), (int)CG_DrawDisconnect);
 
 	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
