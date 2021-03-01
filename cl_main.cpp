@@ -255,6 +255,15 @@ void CL_InitDownloads() {
 	CL_DownloadsComplete();
 }
 
+void CL_FOVLimit() {
+	char* fov = Cvar_VariableString("cg_fov");
+	char* cheats = Cvar_VariableString("sv_cheats");
+	if ((atoi(fov) < 80 || atoi(fov) > 95) && atoi(cheats) != 1) {
+		Com_Printf("Current FOV value is not allowed, reseting to 80.\n");
+		Cvar_Set("cg_fov", "80");
+	}
+}
+
 void CL_Frame(int msec) {
 	void(*call)(int);
 	*(DWORD*)&call = 0x411280;
@@ -271,6 +280,8 @@ void CL_Frame(int msec) {
 	// fix: make discord optional!
 	void CL_DiscordFrame();
 	CL_DiscordFrame();
+
+	CL_FOVLimit();
 
 	call(msec);
 }

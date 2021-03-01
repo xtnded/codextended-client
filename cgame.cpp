@@ -682,22 +682,6 @@ void CG_SCR_DrawScreenField(int stereoFrame) {
 	}
 }
 
-void ChangeFOV() {
-	// but you need to set it manually every time... store in cfg?
-	char* cg_fov = Cvar_VariableString("cg_fov");
-	int argc = Cmd_Argc();
-	if (argc > 1) {
-		char* fov_value = Cmd_Argv(1);
-		if (atoi(fov_value) < 80 || atoi(fov_value) > 95) {
-			Com_Printf("FOV should be between \"80\" and \"95\"\n");
-		} else {
-			Cvar_Set("cg_fov", fov_value);
-		}
-	} else {
-		Com_Printf("FOV is \"%s\" default \"80\"\n", cg_fov);
-	}
-}
-
 void CG_Init(DWORD base) {
 	cgame_mp = base;
 	CG_ServerCommand = (CG_ServerCommand_t)(cgame_mp + 0x2E0D0);
@@ -719,10 +703,8 @@ void CG_Init(DWORD base) {
 	__call(CGAME_OFF(0x3000C893), (int)pm_aimflag);
 	CG_PlayerSprites = (void(*)())CGAME_OFF(0x300274D0);
 
-	// *(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov / FIX: Allow this but find a way to limit fov in a certain range.
+	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
-
-	Cmd_AddCommand("fov", ChangeFOV);
 
 	void CG_SetHeadNames(int flag);
 	CG_SetHeadNames(cg_drawheadnames->integer);
