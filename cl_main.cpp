@@ -257,7 +257,8 @@ void CL_InitDownloads() {
 
 void CL_FOVLimit() {
 	char* fov = Cvar_VariableString("cg_fov");
-	char* cheats = Cvar_VariableString("sv_cheats");
+	char* info = clc_stringData + clc_stringOffsets[1];
+	char* cheats = Info_ValueForKey(info, "sv_cheats");
 	if ((atoi(fov) < 80 || atoi(fov) > 95) && atoi(cheats) != 1) {
 		Com_Printf("Current FOV value is not allowed, reseting to 80.\n");
 		Cvar_Set("cg_fov", "80");
