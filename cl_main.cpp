@@ -96,6 +96,10 @@ void Need_Paks() {
 	Com_Printf("");
 }
 
+char* MAX_PACKET_USERCMDS() {
+	return false;
+}
+
 void DL_Name(const char *localName, char* remoteName) {
 
 	char *downloadName = Cvar_VariableString("cl_downloadName");
@@ -297,6 +301,8 @@ void CL_Init(void) {
 		MsgBox("failed to fix bugs in default cod1");
 		Com_Quit_f();
 	}
+
+	//MsgBox("Welcome in Call of Duty 1.1x");
 
 	void(*oCL_Init)();
 	*(int*)(&oCL_Init) = 0x411E60;

@@ -19,7 +19,6 @@ bool fix_bugs() {
 	void Need_Paks(); //Removing second "Need Paks:" because it's useless one is enough
 	__call(0x43BA04, (int)Need_Paks);
 
-
 	// NOP out the calls to CL_Motd (crash upon startup net not loaded and socket being sent or smth)
 	__nop(0x40F6DA, 0x40F6DA + 5);
 	__nop(0x4117B6, 0x4117B6 + 5);
@@ -27,6 +26,8 @@ bool fix_bugs() {
 
 	/* annoying bugs */
 	__nop(0x42D122, 5); //call Com_AppendCDKey (fixes the invalid cdkey with fs_game)
+	char* MAX_PACKET_USERCMDS();
+	__call(0x40BC18, (int)MAX_PACKET_USERCMDS); //fixes spam with "MAX_PACKET_USERCMDS" if you have 1000 fps
 
 	/*
 	in
