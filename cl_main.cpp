@@ -260,7 +260,7 @@ void CL_FOVLimit() {
 	char* info = clc_stringData + clc_stringOffsets[1];
 	char* cheats = Info_ValueForKey(info, "sv_cheats");
 	if ((atoi(fov) < 80 || atoi(fov) > 95) && atoi(cheats) != 1) {
-		Com_Printf("Current FOV value is not allowed, reseting to 80.\n");
+		Com_Printf("cg_fov %s"" is invalid. Allowed range : 80 - 95\n", fov);
 		Cvar_Set("cg_fov", "80");
 	}
 }
