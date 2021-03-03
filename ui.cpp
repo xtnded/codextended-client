@@ -448,6 +448,13 @@ void UI_StartServerRefresh(qboolean full) {
 	o(full);
 }
 
+
+void UI_DisplayDownloadInfo(const char downloadName, float centerPoint, float yStart, float scale) {
+	void(*DisplayText)(const char, float, float, float);
+	*(int*)&DisplayText = UI_FILE_OFF(0x4000DEA0);
+	DisplayText(downloadName, centerPoint, yStart, 0.25);
+}
+
 void UI_Init(DWORD base) {
 	ui_mp = base;
 	isUIRunning = true;
@@ -475,6 +482,10 @@ void UI_Init(DWORD base) {
 	cvar_t* xui_connect = Cvar_Get("cg_xui_connect", "0", CVAR_ARCHIVE);
 	if (xui_connect->integer) {
 		__call(UI_FILE_OFF(0x4000774E), (int)UI_DrawConnectScreen);
+	}
+	else //so if custom loading screen is not used, download scale is still smaller so it can looks nicer :)
+	{
+	__call(UI_FILE_OFF(0x4000E895), (int)UI_DisplayDownloadInfo);
 	}
 
 	*(BYTE*)UI_FILE_OFF(0x40007BD1) = 0xeb; //jle > jmp for drawing cursor
