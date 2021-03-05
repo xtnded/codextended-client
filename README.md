@@ -5,12 +5,12 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 
 ## Changes/additions
 
-- servername whitelist (no more [] symbols, unnamed servers and spaces in server name)
-- fix for invalid CD-Key when using fs_game / mods
+- servername whitelist (removed [] symbols and trailing spaces in hostname, patched empty hostname)
+- fixed  "invalid CD-Key" when using fs_game / mods
 - cURL (HTTP/fast) download
-- CoD 4-like scoreboard & loading screen
+- CoD 4-like scoreboard & loading screen (optional - cg_xui_scoreboard 1, cg_xui_connect 1)
 - Discord RPC
-- more bugfixes, etc.
+- unlocked FOV (80-85, change with cg_fov)
 
 ## Presentation of several functions
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
