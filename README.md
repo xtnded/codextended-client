@@ -10,7 +10,7 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 - cURL (HTTP/fast) download
 - CoD 4-like scoreboard & loading screen (optional - cg_xui_scoreboard 1, cg_xui_connect 1)
 - Discord RPC
-- unlocked FOV (80-85, change with cg_fov)
+- unlocked FOV (80-95, change with cg_fov)
 
 ## Presentation of several functions
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OTtJrzUuO70/0.jpg)](https://www.youtube.com/watch?v=OTtJrzUuO70)
