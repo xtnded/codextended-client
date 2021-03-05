@@ -278,39 +278,57 @@ void __declspec(naked) InterceptCallToShutdownUI() {
 	}
 }
 
-const char *GetFullStockGametypeName(char *l) {
-	if (!l || !*l)
-		return "Empty gametype";
+char* GetStockGametypeName(char* gt) {
 	char s[64] = { 0 };
-	Q_strncpyz(s, l, sizeof(s));
+	Q_strncpyz(s, gt, sizeof(s));
 
-	for (char *c = s; *c;)
+	for (char* c = s; *c;)
 		*c++ = tolower(*c);
 
 	if (*s == 'd' && *(s + 1) == 'm' && !*(s + 2))
 		return "Deathmatch";
 	else if (*s == 't' && *(s + 1) == 'd' && *(s + 2) == 'm' && !*(s + 3))
 		return "Team Deathmatch";
-	else if (*s == 'c' && *(s + 1) == 't' && *(s + 2) == 'f' && !*(s + 3))
-		return "Capture the Flag";
 	else if (*s == 'r' && *(s + 1) == 'e' && !*(s + 2))
 		return "Retrieval";
 	else if (*s == 'b' && *(s + 1) == 'e' && *(s + 2) == 'l' && !*(s + 3))
 		return "Behind Enemy Lines";
-	else if (*s == 'g' && *(s + 1) == 'g' && !*(s + 2))
-		return "Gungame";
 	else if (*s == 's' && *(s + 1) == 'd' && !*(s + 2))
 		return "Search & Destroy";
-	else if (*s == 'n' && *(s + 1) == 'e' && *(s + 2) == 'w' && *(s + 3) == '_' && *(s + 4) == 's' && *(s + 5) == 'd' && !*(s + 6))
-		return "Search & Destroy Remastered";
-	else if (*s == 'f' && *(s + 1) == 't' && *(s + 2) == 'a' && *(s + 3) == 'g' && !*(s + 4))
-		return "Freezetag";
-	else if (*s == 'o' && *(s + 1) == 'i' && *(s + 2) == 'c' && !*(s + 3))
-		return "One in the chamber";
-	else if (*s == 'd' && *(s + 1) == 'e' && *(s + 2) == 'a' && !*(s + 3) && *(s + 4) == 't' && *(s + 5) == 'h' && *(s + 6) == 'r' && *(s + 7) == 'u' && *(s + 8) == 'n') && !*(s + 9) )
-		return "^3Deathrun";
 
-	return l;
+	return false;
+}
+
+char* GetTxtGametypeName(char* gt, bool colors) {
+	char* name;
+	char* file = va("maps/mp/gametypes/%s.txt", gt);
+	FS_ReadFile(file, (void**)&name);
+
+	if (!name) return false;
+
+	// reimplementation of Q_CleanStr (remove quotes too!)
+	char *d = name, *s = name;
+	int c;
+	while ((c = *s) != 0) {
+		if (Q_IsColorString(s) && !colors) s++;
+		else if (c >= 0x20 && c <= 0x7E && c != 0x22) *d++ = c;
+		s++;
+	}
+	*d = '\0';
+
+	return name;
+}
+
+const char* GametypeName(char* gt, bool colors = false) { // Keep colors for loading screen, remove for RPC.
+	if (!gt || !*gt) return "Unknown Gametype";
+
+	char* name = GetStockGametypeName(gt);
+	if (!name) name = GetTxtGametypeName(gt, colors);
+
+	if (name)
+		return name;
+	else
+		return (colors) ? gt : Q_CleanStr(gt);
 }
 
 void UI_DrawConnectScreen(int overlay) {
@@ -371,7 +389,7 @@ void UI_DrawConnectScreen(int overlay) {
 			RE_SetColor(opacity);
 			SCR_DrawPic(0, 400, frac * 640, LOAD_BAR_HEIGHT, *whiteShader);
 			RE_SetColor(NULL);
-			char *cstring = va("%s - %s", mapname_p, GetFullStockGametypeName(gametype));
+			char *cstring = va("%s - %s", mapname_p, GametypeName(gametype, true));
 			int clen = CG_DrawStrlen(cstring) * 12;
 			SCR_DrawString(320 - clen / 2, 400 + 30 + 2, 1, .6, colorBlack, cstring, NULL, NULL, NULL);
 			SCR_DrawString(320 - clen / 2, 400 + 30, 1, .6, colorWhite, cstring, NULL, NULL, NULL);

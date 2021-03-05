@@ -48,11 +48,11 @@ void Discord_StatusPlaying() {
 	DiscordRichPresence discordPresence;
 	memset(&discordPresence, 0, sizeof(discordPresence));
 
+	const char* GametypeName(char* l, bool colors);
+	discordPresence.state = GametypeName(gametype, false);
+
 	char* CL_ClearHostname(char* hostname, bool colors);
 	discordPresence.details = CL_ClearHostname(hostname, false);
-
-	const char* GetFullStockGametypeName(char* l);
-	discordPresence.state = GetFullStockGametypeName(gametype);
 
 	discordPresence.largeImageKey = mapname;
 	discordPresence.largeImageText = mapname;
