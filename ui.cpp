@@ -308,7 +308,7 @@ const char *GetFullStockGametypeName(char *l) {
 	else if (*s == 'o' && *(s + 1) == 'i' && *(s + 2) == 'c' && !*(s + 3))
 		return "One in the chamber";
 	else if (*s == 'd' && *(s + 1) == 'e' && *(s + 2) == 'a' && !*(s + 3) && *(s + 4) == 't' && *(s + 5) == 'h' && *(s + 6) == 'r' && *(s + 7) == 'u' && *(s + 8) == 'n') && !*(s + 9) )
-		return "^3Deathrun
+		return "^3Deathrun";
 
 	return l;
 }
