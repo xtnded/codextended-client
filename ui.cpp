@@ -285,15 +285,15 @@ char* GetStockGametypeName(char* gt) {
 	for (char* c = s; *c;)
 		*c++ = tolower(*c);
 
-	if (*s == 'd' && *(s + 1) == 'm' && !*(s + 2))
+	if (!strcmp(s, "dm"))
 		return "Deathmatch";
-	else if (*s == 't' && *(s + 1) == 'd' && *(s + 2) == 'm' && !*(s + 3))
+	else if (!strcmp(s, "tdm"))
 		return "Team Deathmatch";
-	else if (*s == 'r' && *(s + 1) == 'e' && !*(s + 2))
+	else if (!strcmp(s, "re"))
 		return "Retrieval";
-	else if (*s == 'b' && *(s + 1) == 'e' && *(s + 2) == 'l' && !*(s + 3))
+	else if (!strcmp(s, "bel"))
 		return "Behind Enemy Lines";
-	else if (*s == 's' && *(s + 1) == 'd' && !*(s + 2))
+	else if (!strcmp(s, "sd"))
 		return "Search & Destroy";
 
 	return false;
