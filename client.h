@@ -19,7 +19,6 @@ static void(*CL_AddReliableCommand)(const char *cmd) = (void(*)(const char*))0x4
 static const char* (*CL_TranslateStringBuf)(const char *string) = (const char*(*)(const char*))0x4A9E20;
 
 static bool unlock_client_structure() {
-
 	__try {
 
 		XUNLOCK((void*)cls_realtime, sizeof(int));

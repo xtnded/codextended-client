@@ -65,8 +65,6 @@ void Sys_ElevateProgram() {
 			ERROR_MSG(err);
 
 	Com_Quit_f();
-
-	//PostQuitMessage(0);
 }
 
 void Sys_RestartProgram(bool bAsAdmin) {
@@ -84,8 +82,6 @@ void Sys_RestartProgram(bool bAsAdmin) {
 
 quit:
 	Com_Quit_f();
-
-	//PostQuitMessage(0);
 }
 
 typedef struct {
@@ -164,36 +160,15 @@ bool determine_cod_version() {
 
 	std::string hash = GetHashText(buf, fs, HashMd5);
 
-#if 0
-	if (OpenClipboard(NULL))
-	{
-		HGLOBAL clipbuffer;
-		char * buffer;
-		EmptyClipboard();
-		clipbuffer = GlobalAlloc(GMEM_DDESHARE, hash.length() + 1);
-		buffer = (char*)GlobalLock(clipbuffer);
-		strcpy(buffer, hash.c_str());
-		GlobalUnlock(clipbuffer);
-		SetClipboardData(CF_TEXT, clipbuffer);
-		CloseClipboard();
-	}
-	else
-		MessageBoxA(NULL, "failed to open clipboard", "", 0);
-#endif
-
 	delete[] buf;
 	fclose(fp);
 	fp = NULL;
 
-	//MessageBoxA(NULL, va("HashText = %s\n", hash.c_str()), __TITLE, MB_OK);
 	for (int i = 0; cod_v_info[i].md5 != NULL; i++) {
-
 		if (!strncmp(cod_v_info[i].md5, hash.c_str(), 32)) {
 			codversion = cod_v_info[i].ver;
 			break;
-		}
-		else if (!strncmp(hash.c_str(), "766345d1ceaf79caf7fe88a214b2f3ec", 32)) {
-			
+		} else if (!strncmp(hash.c_str(), "766345d1ceaf79caf7fe88a214b2f3ec", 32)) { // If hash != [that] update DLL?
 			__call(0x528B38, (int)WinMain_upd);
 			break;
 		}

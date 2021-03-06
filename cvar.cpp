@@ -4,11 +4,6 @@ Cvar_Get_t Cvar_Get = (Cvar_Get_t)0x439350;
 Cvar_Set_t Cvar_Set = (Cvar_Set_t)0x439650;
 Cvar_FindVar_t Cvar_FindVar = (Cvar_FindVar_t)0x439280;
 
-/*
-============
-Cvar_VariableValue
-============
-*/
 float Cvar_VariableValue(const char *var_name) {
 	cvar_t  *var;
 
@@ -19,12 +14,6 @@ float Cvar_VariableValue(const char *var_name) {
 	return var->value;
 }
 
-
-/*
-============
-Cvar_VariableIntegerValue
-============
-*/
 int Cvar_VariableIntegerValue(const char *var_name) {
 	cvar_t  *var;
 
@@ -35,12 +24,6 @@ int Cvar_VariableIntegerValue(const char *var_name) {
 	return var->integer;
 }
 
-
-/*
-============
-Cvar_VariableString
-============
-*/
 char *Cvar_VariableString(const char *var_name) {
 	cvar_t *var;
 
@@ -51,42 +34,28 @@ char *Cvar_VariableString(const char *var_name) {
 	return var->string;
 }
 
-
-/*
-============
-Cvar_VariableStringBuffer
-============
-*/
 char* Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize) {
 	cvar_t *var;
 
 	var = Cvar_FindVar(var_name);
 	if (!var) {
 		*buffer = 0;
-	}
-	else {
+	} else {
 		Q_strncpyz(buffer, var->string, bufsize);
 	}
 	return buffer;
 }
 
-/*
-============
-Cvar_VariableStringBuffer
-============
-*/
 void Cvar_LatchedVariableStringBuffer(const char *var_name, char *buffer, int bufsize) {
 	cvar_t *var;
 
 	var = Cvar_FindVar(var_name);
 	if (!var) {
 		*buffer = 0;
-	}
-	else {
+	} else {
 		if (var->latchedString) {
 			Q_strncpyz(buffer, var->latchedString, bufsize);
-		}
-		else {
+		} else {
 			Q_strncpyz(buffer, var->string, bufsize);
 		}
 	}

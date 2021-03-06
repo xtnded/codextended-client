@@ -11,13 +11,10 @@ static cvar_t *cl_bypassMouseInput = (cvar_t*)0x142F604;
 #define KEY_BACKSPACE 8
 
 void CL_CharEvent_(int key) {
-	//Com_Printf("Key: %d\n", key);
-
 	if (key == (unsigned char) '`' || key == (unsigned char) '~') {
 		return;
 	}
-	/* some day use the field_t types :D:D:DD but for now custom */
-	if (*cls_keyCatchers & KEYCATCH_CONSOLE)
+	if (*cls_keyCatchers & KEYCATCH_CONSOLE) // some day use the field_t types :D:D:DD but for now custom (c) php
 		return;
 
 	if(UIObject::prevFocus != nullptr) {

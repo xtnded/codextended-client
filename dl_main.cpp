@@ -30,7 +30,6 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 int create_progress_download(const char *url, FILE *fp, int (*progress_callback)(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)) {
-
 	if (fp == nullptr)
 		return -1;
 

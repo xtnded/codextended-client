@@ -210,7 +210,6 @@ bool xui_createmainoverlay() {
 
 
 bool MainBtn_Render(UIObject *o) {
-#if 1
 	float fScale = o->fontScale;
 	float offS = 0;
 	if (o->selected) {
@@ -218,7 +217,6 @@ bool MainBtn_Render(UIObject *o) {
 		fScale *= 1.2;
 	}
 	vec4_t whiteColor = { 1, 1, 1, 1 };
-	//SCR_DrawString(o->x - offS, o->y + SMALLCHAR_HEIGHT, 2, fScale, (!o->selected) ? o->bgColor : whiteColor, o->text.c_str(), NULL, NULL, NULL);
 
 	glDisable(GL_TEXTURE_2D);
 	if (o->selected)
@@ -231,7 +229,7 @@ bool MainBtn_Render(UIObject *o) {
 	glPrint(o->text.c_str());
 	glScalef(.5, .5, .5);
 	glEnable(GL_TEXTURE_2D);
-#endif
+
 	return false;
 }
 
@@ -333,19 +331,7 @@ bool XUI_GL_RenderTile(UIObject *o) {
 	Vector4Copy(o->bgColor, col);
 	if (o->gltexture != nullptr && o->gltexture->loaded) {
 		glColor4fv(col);
-#if 0
-		glEnable(GL_BLEND);
-		glDepthMask(false);
-		if (o->gltexture->blendparms != -1) {
-			glBlendFunc(o->gltexture->bp1, o->gltexture->bp2);
-		}
-#endif
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		RGL_DrawPic(o->x, o->y, o->width, o->height, o->gltexture->textureID);
-#if 0
-		glDepthMask(true);
-		glDisable(GL_BLEND);
-#endif
 	}
 	vec4_t whiteColor = { 1, 1, 1, 1 };
 	glColor4fv(whiteColor);
@@ -355,13 +341,6 @@ bool XUI_GL_RenderTile(UIObject *o) {
 #define UFONTSCALE .3
 
 	int offsetY = ((UFONTSCALE / SMALLCHAR_SCALE) * SMALLCHAR_HEIGHT);
-	//SCR_DrawString(o->x, o->y + o->height - offsetY + 5, 1, UFONTSCALE, whiteColor, szString, NULL, NULL, NULL);
-#if 0
-	glDisable(GL_TEXTURE_2D);
-	glRasterPos2d(o->x, o->y + o->height - offsetY + 5);
-	glPrint(szString);
-	glEnable(GL_TEXTURE_2D);
-#endif
 	glDisable(GL_BLEND);
 	return false;
 }
@@ -450,12 +429,10 @@ void XUI_CreateMenu() {
 	//menu->AddElement(spacer1);
 	//menu->AddElement(spacer2);
 
-#if 1
 	header->SetVisible(true);
 	header->showOnCvar("xui_use", 0);
 	menu->SetVisible(true);
 	menu->showOnCvar("xui_use", 0);
-#endif
 }
 
 void XUI_Destroy() {

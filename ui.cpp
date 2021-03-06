@@ -102,7 +102,6 @@ bool Menu_IsMainOpen() {
 	if (menu_main == NULL)
 		return false;
 
-	//Com_Printf("flags = %02X\n", &menu_main->flags);
 	if (menu_main->flags & (WINDOW_VISIBLE | WINDOW_HASFOCUS)) {
 		return true;
 	}
@@ -163,33 +162,11 @@ void UI_RunMenuScript(char **args) {
 	Q_strcat(script, sizeof(script), *args);
 	p = (char*)script;
 
-	//Com_Printf("args = %02X\n", args);
-
-	//if (args != NULL)
-		//Com_Printf("args = %s\n", *args);
-
 	char *name = NULL;
 
 	if (String_Parse(&p, (const char**)&name)) {
-
-		//Com_Printf("name = %s\n", name);
-#if 0
-		if (!Q_stricmp(name, "CM_Send")) {
-
-#if 0
-			Menus_CloseByName("mods_menu");
-			Menus_OpenByName("mods_menu", 1);
-#endif
-
-			void Enc_SendFriendRequest();
-			Enc_SendFriendRequest();
-			free(name);
-			return;
-		}
-#endif
 		free(name);
 	}
-
 
 	static BYTE orig_bytes[5] = { 0x81, 0xEC, 0x4C, 0x8, 0 };
 	_memcpy((void*)UI_FILE_OFF(0x4000A5F0), orig_bytes, sizeof(orig_bytes));
@@ -206,7 +183,6 @@ void Menu_PaintAll() {
 	}
 
 	RE_SetColor(vColorWhite);
-#if 1
 	if (xui != nullptr) {
 		for (auto& i : xui->menus) {
 			if (!i->IsOpen())
@@ -221,13 +197,11 @@ void Menu_PaintAll() {
 		}
 	}
 	RE_SetColor(vColorWhite);
-#endif
 }
 
 image_t *cursorImage = nullptr;
 
 void _UI_Init(int inGameLoad) {
-
 	void(*o)(int);
 	*(int*)&o = UI_FILE_OFF(0x4000D310);
 
@@ -244,14 +218,7 @@ void _UI_Init(int inGameLoad) {
 			cursorImage = image;
 			break;
 		}
-		//Com_Printf("image name ; %s\n", image->imgName);
 	}
-
-#if 0
-	//set int 3 breakpoint
-	*(BYTE*)pMenus_Open = 0xcd;
-	*(BYTE*)((int)pMenus_Open + 1) = 0x3;
-#endif
 }
 
 static bool isUIRunning = false;
@@ -282,9 +249,6 @@ char* GetStockGametypeName(char* gt) {
 	char s[64] = { 0 };
 	Q_strncpyz(s, gt, sizeof(s));
 
-	for (char* c = s; *c;)
-		*c++ = tolower(*c);
-
 	if (!strcmp(s, "dm"))
 		return "Deathmatch";
 	else if (!strcmp(s, "tdm"))
@@ -306,7 +270,7 @@ char* GetTxtGametypeName(char* gt, bool colors) {
 
 	if (!name) return false;
 
-	// reimplementation of Q_CleanStr (remove quotes too!)
+	// Reimplementation of Q_CleanStr (remove quotes too).
 	char *d = name, *s = name;
 	int c;
 	while ((c = *s) != 0) {
@@ -373,8 +337,6 @@ void UI_DrawConnectScreen(int overlay) {
 
 		char gametype[64] = { 0 };
 		Q_strncpyz(gametype, Info_ValueForKey(info, "g_gametype"), sizeof(gametype));
-		for (char *c = gametype; *c;)
-			*c++ = toupper(*c);
 
 		int total = atol(Cvar_VariableString("com_expectedhunkusage"));
 		if (total > 0) {
@@ -404,11 +366,8 @@ void UI_DrawConnectScreen(int overlay) {
 	SCR_DrawPic(0, 0, 640, 480, blackShader);
 	RE_SetColor(NULL);
 
-	extern XTexture textureServerListIcon;
 	void PrintFont(unsigned int fontID, const char *fmt, ...);
 	unsigned int fontMainMenuHeader;
-
-	//RGL_DrawPic(0, 0, 640, 100, textureServerListIcon.textureID);
 
 	static int connect_dots = 0;
 	static int connect_dots_time = *cls_realtime;
@@ -426,29 +385,24 @@ void UI_DrawConnectScreen(int overlay) {
 	}
 
 	switch (*cls_state) {
-		case CA_CONNECTING: {
+		case CA_CONNECTING:
 			text = va("Connecting to %s%s", cls_servername, szdots);
-		}
 		break;
-
-		case CA_CHALLENGING: {
+		case CA_CHALLENGING:
 			text = va("Challenging%s", szdots);
-		} break;
-
-		case CA_CONNECTED: {
+		break;
+		case CA_CONNECTED:
 			char *downloadName = Cvar_VariableString("cl_downloadName");
-
 			if (*downloadName) {
 				void(*UI_DisplayDownloadInfo)(char*, float, float, float) = (void(*)(char*, float, float, float))UI_FILE_OFF(0x4000DEA0);
-
 				UI_DisplayDownloadInfo(downloadName, 320, 55, 0.25);
-
 				return;
 			}
 
-			text = va("Synchronizing game settings%s", szdots); //awaiting gamestate
-		} break;
+			text = va("Synchronizing game settings%s", szdots);
+		break;
 	}
+
 	if (text != nullptr) {
 		int txtlen = (CG_DrawStrlen(text) - connect_dots) * 9;
 		SCR_DrawString(320 - txtlen / 2 + 2, 140 + 2, 1, .4, greyColor, text, NULL, NULL, NULL);
@@ -468,7 +422,6 @@ void UI_StartServerRefresh(qboolean full) {
 	o(full);
 }
 
-
 void UI_DisplayDownloadInfo(const char downloadName, float centerPoint, float yStart, float scale) {
 	void(*DisplayText)(const char, float, float, float);
 	*(int*)&DisplayText = UI_FILE_OFF(0x4000DEA0);
@@ -478,11 +431,8 @@ void UI_DisplayDownloadInfo(const char downloadName, float centerPoint, float yS
 void UI_Init(DWORD base) {
 	ui_mp = base;
 	isUIRunning = true;
-	//MsgBox(va("base= %02X\n", base));
-#if 1
 
 	Menu_SetFeederSelection = (Menu_SetFeederSelection_t)UI_FILE_OFF(0x40016A10);
-
 	pMenus_OpenByName = (FARPROC)UI_FILE_OFF(0x400134B0);
 	pMenus_CloseByName = (FARPROC)UI_FILE_OFF(0x40010640);
 	pMenus_Open = (FARPROC)UI_FILE_OFF(0x40013400);
@@ -494,7 +444,6 @@ void UI_Init(DWORD base) {
 	
 	__call(UI_FILE_OFF(0x40007BA5), (int)Menu_PaintAll);
 	__jmp(UI_FILE_OFF(0x4000A5F0), (int)UI_RunMenuScript);
-	//__call(UI_FILE_OFF(0x400076ED), (int)_UI_MouseEvent);
 	__call(UI_FILE_OFF(0x400076BE), (int)_UI_Init);
 
 	__call(UI_FILE_OFF(0x4000AA55), (int)UI_StartServerRefresh);
@@ -503,19 +452,13 @@ void UI_Init(DWORD base) {
 	if (xui_connect->integer) {
 		__call(UI_FILE_OFF(0x4000774E), (int)UI_DrawConnectScreen);
 	}
-	else //so if custom loading screen is not used, download scale is still smaller so it can looks nicer :)
-	{
-	__call(UI_FILE_OFF(0x4000E895), (int)UI_DisplayDownloadInfo);
-	}
 
-	*(BYTE*)UI_FILE_OFF(0x40007BD1) = 0xeb; //jle > jmp for drawing cursor
+	__call(UI_FILE_OFF(0x4000E895), (int)UI_DisplayDownloadInfo); // Smaller download text (UDP only).
 
+	*(BYTE*)UI_FILE_OFF(0x40007BD1) = 0xeb; // jle > jmp for drawing cursor
 
 	pInterceptCallToShutdownUI = UI_FILE_OFF(0x40007C20);
 	__call(UI_FILE_OFF(0x400076C8), (int)InterceptCallToShutdownUI);
-
-	//Cmd_AddCommand("utest", __utest);
-#endif
 
 	char *szPath;
 	for (int i = 0; szStockMaps[i] != NULL; i++) {

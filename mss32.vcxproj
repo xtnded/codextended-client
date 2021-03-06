@@ -136,7 +136,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs></DelayLoadDLLs>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -169,7 +170,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs></DelayLoadDLLs>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -202,7 +204,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/DEF:lib_export.def %(AdditionalOptions)</AdditionalOptions>
-      <DelayLoadDLLs></DelayLoadDLLs>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
       <AdditionalDependencies>discord-rpc.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -225,7 +228,6 @@
     <ClInclude Include="exmaster_client.h" />
     <ClInclude Include="keycodes.h" />
     <ClInclude Include="keys.h" />
-    <ClInclude Include="script.h" />
     <ClInclude Include="hdd_serial_number.h" />
     <ClInclude Include="mem_util.h" />
     <ClInclude Include="render.h" />
@@ -264,11 +266,11 @@
     </ClCompile>
     <ClCompile Include="dl_main.cpp" />
     <ClCompile Include="exmaster_client.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="xm_phandler.cpp" />
     <ClCompile Include="xui.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="fixes.cpp" />
-    <ClCompile Include="game.cpp" />
     <ClCompile Include="xuidtool.cpp" />
     <ClCompile Include="hook.cpp" />
     <ClCompile Include="librarymodule.cpp" />
@@ -278,7 +280,6 @@
     <ClCompile Include="xtexture.cpp" />
     <ClCompile Include="shared.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="script.cpp" />
     <ClCompile Include="ui.cpp" />
     <ClCompile Include="win_authority.cpp" />
     <ClCompile Include="win_main.cpp" />

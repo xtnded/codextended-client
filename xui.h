@@ -185,16 +185,7 @@ public:
 	}
 
 	bool IsColliding(int x, int y) {
-#if 1
-		if (x >= x && x <= x + width
-			&& y >= y && y <= y + height)
-		{
-			return true;
-		}
-		return false;
-#endif
-		//return (abs(x - x) * 2 < (width + 5)) && (abs(y - y) * 2 < (height + 5));
-
+		return (x >= x && x <= x + width && y >= y && y <= y + height);
 	}
 
 	virtual ~UIObject() {
@@ -231,7 +222,6 @@ public:
 #define OVERLAY_HEIGHT 20
 		RE_SetColor(colBlackFade);
 		SCR_DrawPic(x, y + this->height - OVERLAY_HEIGHT, width, OVERLAY_HEIGHT, *whiteShader);
-#if 1
 		vec4_t whiteColor = { 1, 1, 1, 1 };
 		RE_SetColor(whiteColor);
 
@@ -241,7 +231,6 @@ public:
 
 		int offsetY = ((UFONTSCALE / SMALLCHAR_SCALE) * SMALLCHAR_HEIGHT);
 		SCR_DrawString(x, y + height - offsetY + 5, 1, UFONTSCALE, whiteColor, szString, NULL, NULL, NULL);
-#endif
 		vec4_t colWhite = { 1, 1, 1, .15 };
 		RE_SetColor(colWhite);
 

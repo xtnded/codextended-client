@@ -80,13 +80,13 @@ char *(*CG_Argv)(int) = nullptr;
 
 void myCG_ServerCommand(void) {
 	int argc = Cmd_Argc();
-#if 0
-	Com_Printf("^2CG_ServerCommand: ");
+	#if 0
+		Com_Printf("^2CG_ServerCommand: ");
+		for (int i = 0; i < argc; i++)
+			Com_Printf("%s ", Cmd_Argv(i));
+		Com_Printf("\n");
+	#endif
 
-	for (int i = 0; i < argc; i++)
-		Com_Printf("%s ", Cmd_Argv(i));
-	Com_Printf("\n");
-#endif
 	if (argc > 0) {
 		char* cmd = Cmd_Argv(0);
 		if (strlen(cmd) > 0) {
@@ -114,26 +114,17 @@ void myCG_ServerCommand(void) {
 				if (xui_alt_chat->modified)
 					chatmessages.clear();
 			} else if (*cmd == 'b') {
-#if 1
 				Com_DPrintf("[CG_ParseScores] b ");
 				for (size_t i = 0; i < argc; i++) {
 					Com_DPrintf("%s ", Cmd_Argv(i));
-			}
+				}
 				Com_DPrintf("\n");
-#endif
 			} else if (*cmd == 'v') {
 				if (argc > 1) {
 					char* var = Cmd_Argv(1);
 					for (int i = 0; disliked_vars[i]; i++) {
 						if (!strcmp(disliked_vars[i], var))
-							return; //kindly fuck off please
-
-#if 0
-
-						if (!strcmp(var, "name") && cl_sv_namechange->integer)
-							return;//we don't allow namechanging by server
-
-#endif
+							return; // kindly fuck off please (c) php
 					}
 				}
 
@@ -151,14 +142,6 @@ void pm_aimflag() {
 	int *v4 = (int *)(ps + 12);
 
 	int val = *(int*)(gclient + 21); //336? 84*4=336 /84/4=21??
-
-#if 0
-
-	cvar_t *dev = Cvar_Get("developer", "0", 0);
-
-	if (dev->integer)
-		Com_Printf("val = %d\n", val);
-#endif
 
 	if (val == 1023) {
 		*v4 |= 0x20;
@@ -292,7 +275,6 @@ void __cdecl cg_playersprites_sub() {
 #ifndef SMALLCHAR_WIDTH
 #define SMALLCHAR_WIDTH 48
 #endif
-		//float w = CG_DrawStrlen( other_info->name ) * SMALLCHAR_WIDTH;
 		vec4_t color = { 1, 1, 1, st->alpha };
 		vec3_t org = { 0 };
 		org[0] = *(float*)((int)cent + 504);
@@ -301,7 +283,6 @@ void __cdecl cg_playersprites_sub() {
 		char tmp_name[64] = { 0 };
 		strcpy(tmp_name, other_info->name);
 		R_AddDebugString(org, color, .5, Q_CleanStr(tmp_name));
-		//R_AddDebugString(org, color, .5, va("%s [%s]", Q_CleanStr(tmp_name), teamStrings[st->team]));
 	}
 }
 
@@ -316,7 +297,7 @@ void CG_SetHeadNames(int flag) {
 	if (!cgame_mp)
 		return;
 
-	if (*cls_state != 6) //CA_ACTIVE
+	if (*cls_state != 6) // CA_ACTIVE
 		return;
 
 	static char org_bytes[2][5] = {

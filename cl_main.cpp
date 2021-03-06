@@ -84,16 +84,16 @@ void CL_Connect_f() {
     }        
 
     char* info = clc_stringData + clc_stringOffsets[1];
-    char *fs_game = Info_ValueForKey(info, "fs_game"); //If servers fs_game is not set(no mods) but client has fs_game set to some value it's gonna restart it to "" so he won't get custom huds from last modded server he was connected to
+    char *fs_game = Info_ValueForKey(info, "fs_game"); // Reset client fs_game if loaded & server doesn't use it.
 	if (fs_game == "") {
-		Cvar_Set("fs_game", fs_game); 
+		Cvar_Set("fs_game", ""); 
 	}
 }
 
 void(*CL_DownloadsComplete)(void) = (void(*)())0x40FFB0;
 
 void Need_Paks() {
-	Com_Printf("");
+	return;
 }
 
 char* MAX_PACKET_USERCMDS() {
@@ -101,9 +101,8 @@ char* MAX_PACKET_USERCMDS() {
 }
 
 void DL_Name(const char *localName, char* remoteName) {
-
 	char *downloadName = Cvar_VariableString("cl_downloadName");
-	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName));
+	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName)); // Enough spaces to render name fully. :P
 }
 
 static int use_regular_dl = 0;
@@ -113,11 +112,6 @@ int dl_files_count = 0;
 void WWW_BeginDownload(void) {
 	char localTempName[MAX_PATH];
 	char remoteTempName[MAX_PATH];
-#if 0
-	void(*nextdl)(void);
-	*(int*)&nextdl = 0x410190;
-	nextdl();
-#endif
 
 	if (clc_bWWWDl)
 		return;
@@ -126,22 +120,18 @@ void WWW_BeginDownload(void) {
 	char *remoteName, *localName;
 
 	char* info = clc_stringData + clc_stringOffsets[1];
-
 	char *url = Info_ValueForKey(info, "sv_wwwBaseURL");
-	// We are looking to start a download here
+
 	if (*clc_downloadList) {
 		s = clc_downloadList;
 
-
 		dl_files_count = 0;
-
 		int i;
 		for (i = 0; i < strlen(clc_downloadList); i++)
 			if (clc_downloadList[i] == '@')
 				dl_files_count++;
 
-		// format is:
-		//  @remotename@localname@remotename@localname, etc.
+		// @remotename@localname@remotename@localname, etc.
 
 		if (*s == '@') {
 			s++;
@@ -157,11 +147,10 @@ void WWW_BeginDownload(void) {
 		localName = s;
 		if ((s = strchr(s, '@')) != NULL) {
 			*s++ = 0;
-		}
-		else {
+		} else {
 			s = localName + strlen(localName); // point at the nul byte
-
 		}
+
 		int tmp = use_regular_dl;
 		use_regular_dl = 0;
 		if (cl_wwwDownload->integer && url && *url && !tmp) {
@@ -169,9 +158,6 @@ void WWW_BeginDownload(void) {
 				"Localname: %s\n"
 				"Remotename: %s\n"
 				"****************************\n", localName, remoteName);
-
-			//Q_strncpyz(downloadName, localName, sizeof(downloadName));
-			//Com_sprintf(cls_downloadTempName, sizeof(downloadTempName), "%s.tmp", localName);
 
 			Cvar_Set("cl_downloadSize", "0");
 			Cvar_Set("cl_downloadCount", "0");
@@ -189,7 +175,6 @@ void WWW_BeginDownload(void) {
 
 				Com_Error(ERR_DROP, error);
 				return;
-				//goto default_dl;
 			}
 
 			clc_bWWWDl = true;
@@ -197,7 +182,6 @@ void WWW_BeginDownload(void) {
 
 		*cls_downloadRestart = qtrue;
 
-		// move over the rest
 		memmove(clc_downloadList, s, strlen(s) + 1);
 
 		return;
@@ -227,17 +211,14 @@ void CL_WWWDownload() {
 		clc_bWWWDl = false;
 		*cls_downloadRestart = 1;
 		CL_DownloadsComplete();
-	}
-	else { //sv_wwwBaseURL check if incorrect 
-		const char *error = va( "Download failure while getting %s probably URL is incorrect", Cvar_VariableString("cl_downloadName") ); // get the msg before clearing structs
-		//clc_bWWWDl = false;
-		//use_regular_dl = 1;
-
+	} else {
+		// Perhaps actually check the response? Invalid URL, forbidden, etc?
+		const char* error = va("Download failure while getting %s.\nURL might be invalid.", Cvar_VariableString("cl_downloadName"));
 		Com_Error(ERR_DROP, error);
 		return;
-		//CL_DownloadsComplete();
 	}
-	//((void(*)())0x40F640)(); //CL_Reconnect_f
+
+	// ((void(*)())0x40F640)(); // CL_Reconnect_f
 }
 
 void CL_InitDownloads() {
@@ -245,14 +226,11 @@ void CL_InitDownloads() {
 		return;
 
 	if (cl_allowDownload->integer && FS_ComparePaks(clc_downloadList, 1024, qtrue)) {
-		// this gets printed to UI, i18n
 		Com_Printf("Need paks: %s\n", clc_downloadList);
-
-	if (*clc_downloadList) {
-		// if autodownloading is not enabled on the server
-		*cls_state = 3;
-		CL_NextDownload();
-		return;
+		if (*clc_downloadList) { // if autodownloading is not enabled on the server
+			*cls_state = 3;
+			CL_NextDownload();
+			return;
 		}
 	}
 
@@ -264,7 +242,7 @@ void CL_FOVLimit() {
 	char* info = clc_stringData + clc_stringOffsets[1];
 	char* cheats = Info_ValueForKey(info, "sv_cheats");
 	if ((atoi(fov) < 80 || atoi(fov) > 95) && atoi(cheats) != 1) {
-		Com_Printf("cg_fov %s"" is invalid. Allowed range : 80 - 95\n", fov);
+		Com_Printf("cg_fov \"%s\" is invalid. Allowed values: \"80\" - \"95\".\n", fov);
 		Cvar_Set("cg_fov", "80");
 	}
 }
@@ -282,8 +260,7 @@ void CL_Frame(int msec) {
 	if (clc_bWWWDl)
 		CL_WWWDownload();
 
-	// fix: make discord optional!
-	void CL_DiscordFrame();
+	void CL_DiscordFrame(); // Discord optional?
 	CL_DiscordFrame();
 
 	CL_FOVLimit();
@@ -301,8 +278,6 @@ void CL_Init(void) {
 		MsgBox("failed to fix bugs in default cod1");
 		Com_Quit_f();
 	}
-
-	//MsgBox("Welcome in Call of Duty 1.1x");
 
 	void(*oCL_Init)();
 	*(int*)(&oCL_Init) = 0x411E60;
@@ -324,23 +299,15 @@ void CL_Init(void) {
 	Cvar_Set("shortversion", "1.1x");
 
 	#if 0
-		void Sys_ElevateProgram();
-		Sys_ElevateProgram();
-	#endif
-	#if 0
+		// None of these seem to work.
 		char*(__fastcall*CL_TranslateString)(const char *string, char *buf, int);
 		*(int*)&CL_TranslateString = 0x4ABF00;
-
 		static const char* (*CL_TranslateStringBuf2)(const char *string, const char *type) = (const char*(*)(const char*,const char*))0x4A9E20;
-
-		char buf[32000] = { 0 };
-		//MsgBox(CL_TranslateString("EXE_ENDOFGAME",buf,0));
+		MsgBox(CL_TranslateString("EXE_ENDOFGAME",buf,0));
 		const char *b = CL_TranslateStringBuf2("CGAME_PRONE_BLOCKED", "cgame");
 		if (b == nullptr)
 			b = "(null)";
 		MsgBox(b);
-
-		//MsgBox(buf);
 	#endif
 }
 

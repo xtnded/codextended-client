@@ -35,7 +35,6 @@ void DestroyFonts() {
 		glDeleteLists(fontIngameChatMessage, 96);
 	if (font14px)
 		glDeleteLists(font14px, 96);
-
 }
 
 bool GenerateFont(int fontsize, const char *fontname, unsigned int *base) {
@@ -146,17 +145,8 @@ char **s_shaderText = (char**)0x11EDD60;
 "}                                                   \n"
 
 void ScanAndLoadShaderFiles(void) {
-
 	void(*o)(void) = (void(*)(void))0x4FD560;
 	o();
-#if 0
-	//strcat(*s_shaderText, "\n" C_SHADER);
-	FILE *out = fopen("C:/Users/R/Desktop/codextended.txt", "w");
-	if (!out)
-		return;
-	fprintf(out, "s_shaderText = %s\n", *s_shaderText);
-	fclose(out);
-#endif
 }
 
 #define EMPTY_SHADER_TEMPLATE "%s\n{\n\t{\n\t\tmap $whiteimage\n\t}\n}\n"
@@ -164,10 +154,6 @@ void ScanAndLoadShaderFiles(void) {
 void AddCustomShader() {
 	strcat(*s_shaderText, "\n" GLOW_SHADER);
 }
-
-//004FD735   > 8B4424 1C      MOV EAX, DWORD PTR SS : [ESP + 1C]
-//004FD739   . 50             PUSH EAX
-//004FD73A   . FF15 78896D01  CALL DWORD PTR DS:[16D8978]              ;  _CoDMP.0042B710
 
 void __declspec(naked) AddCustomShader_w() {
 	__asm
@@ -181,7 +167,6 @@ void __declspec(naked) AddCustomShader_w() {
 }
 
 void* ri_Hunk_AllocAlign(int size) {
-	//void*(*Hunk_AllocAlign)(int) = (void*(*)(int))0x432160; //16D892C
 	void*(*Hunk_AllocAlign)(int) = (void*(*)(int))0x432160;
 
 	int s = size + strlen(GLOW_SHADER) + 2;
@@ -200,7 +185,6 @@ void DestroyRender() {
 }
 
 void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba) {
-
 	SCR_AdjustFrom640(&x, &y, &w, &h);
 
 	glFinish();
@@ -208,10 +192,7 @@ void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba) {
 	if (!*(int*)0x16D8E70)
 		RB_SetGL2D();
 	glDisable(GL_TEXTURE_2D);
-#if 1
 	glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#endif
 	glColor4fv(rgba);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0);
@@ -234,7 +215,6 @@ void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba) {
 }
 
 void RGL_DrawPic(float x, float y, float w, float h, unsigned int tex) {
-
 	SCR_AdjustFrom640(&x, &y, &w, &h);
 
 	glFinish();
@@ -262,7 +242,6 @@ void RGL_DrawPic(float x, float y, float w, float h, unsigned int tex) {
 }
 
 void RB_ShowImages() {
-
 	if (*cls_keyCatchers & KEYCATCH_CONSOLE) {
 
 	}
@@ -271,7 +250,6 @@ void RB_ShowImages() {
 		cvar_t *xui_alt_chat = Cvar_Get("cg_chat_alternative", "0", CVAR_ARCHIVE);
 
 		if (xui_alt_chat->integer) {
-#if 1
 			if (*cls_state > CA_CONNECTED) {
 				if (cg_chat_font->modified) {
 
@@ -291,9 +269,7 @@ void RB_ShowImages() {
 				glDisable(GL_BLEND);
 			}
 		}
-#endif
 		if (*cls_keyCatchers & KEYCATCH_UI) {
-#if 1
 			if (xui != nullptr) {
 				for (auto &i : xui->menus) {
 					if (!i->IsOpen())
@@ -310,16 +286,11 @@ void RB_ShowImages() {
 					i->Render(false);
 				}
 			}
-#endif
 
 			extern image_t *cursorImage;
 			//draw here own cursor
 			if (ui_cursor != nullptr && cursorImage != nullptr) {
 				glEnable(GL_BLEND);
-#if 0
-				glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-				glBlendFunc(GL_DST_COLOR, GL_ONE);
-#endif
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				RGL_DrawPic(ui_cursor->x - 16, ui_cursor->y - 16, 32, 32, cursorImage->texnum);
 				glDisable(GL_BLEND);
@@ -346,29 +317,6 @@ void GL_Bind() {
 	*(int*)&call = 0x4D5450;
 	__asm mov esi, image
 	call();
-
-	char* imgName = (char*)image;
-
-	/*char origbuf[] = {0x85,0xF6,0x57,0x75,0x1A};
-
-	_memcpy((void*)0x4D5450, &origbuf[0], sizeof(origbuf));
-
-	call(image);
-
-	__jmp(0x4D5450, (int)GL_Bind);*/
-
-	/*DWORD texnum;
-
-	if(!image) {
-	Com_Printf("^2GL_Bind: NULL image\n");
-	texnum = *(DWORD *)(*(DWORD*)0x16C4D58 + 88);
-	} else {
-	texnum = *(DWORD *)(image + 88);
-	}
-
-	if(r_nobind->integer && *(int*)0x16C4DDC) {
-	texnum = *(DWORD *)(*(int*)0x16C4DDC + 88);
-	}*/
 }
 
 void RB_EndSurface(void);
@@ -393,13 +341,9 @@ void __stdcall RB_BeginSurface() {
 	}
 	lastShader = shader;
 
-	//Com_Printf("shadername = %s\n", shader->name);
-#if 1
-		if (strstr(lastShader->name, cl_findshader->string) != NULL) {
-			hook_bind = true;
-		}
-#endif
-
+	if (strstr(lastShader->name, cl_findshader->string) != NULL) {
+		hook_bind = true;
+	}
 
 	void(__stdcall *call)();
 	*(int*)&call = 0x4FF570;
@@ -414,7 +358,6 @@ static GLfloat rot = 0.0;
 static time_t rot_time = 0;
 
 void drawCube(vec3_t org, float size) {
-
 	glPushMatrix();
 	glTranslatef(org[0], org[1], org[2]);
 
@@ -473,7 +416,6 @@ void drawCube(vec3_t org, float size) {
 }
 
 void ExtraRender() {
-
 	cvar_t *t = Cvar_Get("extrarender", "0", 0); //without if u use r_showimages it crashes
 	if (!t->integer)
 		return;
@@ -483,41 +425,13 @@ void ExtraRender() {
 
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_NORMALIZE);
-	/*
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	//glCullFace(GL_CULL_FACE);
-	glLightfv(GL_LIGHT0,GL_POSITION,pos);
-	float col[]={1.0,1.0,1.0,1.0};
-	glLightfv(GL_LIGHT0,GL_DIFFUSE,col);
-	*/
 
 	drawCube(org, 60);
 
 	glColor3f(1, 1, 1);
 
-#if 0
-	void(*SetViewportAndScissor)();
-	*(UINT32*)&SetViewportAndScissor = 0x4D6080;
-	SetViewportAndScissor();
-#endif
-
-#if 0
-	glColor3f(0, 1, 0);
-	glPushMatrix();
-	glTranslatef(org[0], org[1], org[2]);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glPrint("RUNAWAY");
-	glPopMatrix();
-#endif
-
 	glDisable(GL_COLOR_MATERIAL);
 	glDisable(GL_NORMALIZE);
-
-	/*
-	glDisable(GL_LIGHT0);
-	glDisable(GL_LIGHTING);
-	*/
 }
 
 
@@ -532,6 +446,4 @@ void __declspec(naked) RB_ExecuteRenderCommands() {
 	}
 }
 
-void DrawTris(void *input) {
-
-}
+void DrawTris(void *input) {}

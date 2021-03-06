@@ -13,7 +13,6 @@ bool find_cod_version();
 void codextended() {
 	srand(time(NULL));
 
-
 	if (GetModuleHandleA("codextended.dll") != NULL) {
 		return;
 	}

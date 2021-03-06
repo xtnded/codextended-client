@@ -22,9 +22,6 @@ bool bNullClient = false;
 bool bDeveloper = false;
 
 HWND g_Dialog = nullptr;
-#if 0
-HBITMAP DlgBitmap = nullptr;
-#endif
 int dwCancelDownload = 0;
 
 BOOL CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -35,10 +32,6 @@ BOOL CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//EndDialog(hWnd, 0);
 		//MessageBoxA(hWnd, "Successfully updated!", __TITLE, MB_OK);
 
-#if 0
-		if (DlgBitmap != nullptr);
-			DeleteObject(DlgBitmap);
-#endif
 		if (g_Dialog != nullptr) {
 			DestroyWindow(g_Dialog);
 			g_Dialog = nullptr;
@@ -51,13 +44,6 @@ BOOL CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendDlgItemMessage(hWnd, IDC_PROGRESS1, PBM_SETRANGE, 1, MAKELONG(0, 100));
 		SendDlgItemMessage(hWnd, IDC_PROGRESS1, PBM_SETSTEP, 0, 0);
 		//SendDlgItemMessage(hWnd, IDC_PROGRESS1, PBM_STEPIT, 0, 0);
-#if 0
-		DlgBitmap = (HBITMAP)LoadImageA(hModule, MAKEINTRESOURCE(IDB_BITMAP1),
-			IMAGE_BITMAP, 0, 0, LR_SHARED | LR_COPYFROMRESOURCE);
-		HBITMAP old = (HBITMAP)SendDlgItemMessageA(hWnd, IDC_STATIC4, STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)DlgBitmap);
-		if (old && old != DlgBitmap)
-			DeleteObject(old);
-#endif
 		} return 0;
 
 	default:
@@ -156,12 +142,6 @@ static int dl_progress_cb(void *clientp, double dltotal, double dlnow, double ul
 }
 
 bool Sys_UpdateExtended(const char *uri) {
-#if 0
-#ifdef XTNDED_DEV
-	return false;
-#endif
-#endif
-
 	int Sys_IsAdmin();
 	if (!Sys_IsAdmin()) {
 		void Sys_ElevateProgram();
