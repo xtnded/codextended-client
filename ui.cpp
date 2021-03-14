@@ -324,9 +324,9 @@ void UI_DrawConnectScreen(int overlay) {
 			}
 		}
 		if (!f)
-			SCR_DrawPic(0, 0, 640, 480, mapshader);
+			SCR_DrawPic(0, 0, 640, 512, mapshader);
 		else
-			SCR_DrawPic(0, -200, 640, 880, mapshader);
+			SCR_DrawPic(0, 0, 640, 512, mapshader);
 
 		if (f) {
 			mapname_p = mapname + 3;
@@ -353,7 +353,6 @@ void UI_DrawConnectScreen(int overlay) {
 			RE_SetColor(NULL);
 			char *cstring = va("%s - %s", mapname_p, GametypeName(gametype, true));
 			int clen = CG_DrawStrlen(cstring) * 12;
-			SCR_DrawString(320 - clen / 2, 400 + 30 + 2, 1, .6, colorBlack, cstring, NULL, NULL, NULL);
 			SCR_DrawString(320 - clen / 2, 400 + 30, 1, .6, colorWhite, cstring, NULL, NULL, NULL);
 		}
 		return;
