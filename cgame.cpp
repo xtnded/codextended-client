@@ -655,7 +655,7 @@ void CG_SCR_DrawScreenField(int stereoFrame) {
 		CG_SetHeadNames(cg_drawheadnames->integer);
 	}
 
-	if (cg_xui_scoreboard->modified) {
+	if (cg_xui_scoreboard->modified && *cls_state == 6) {
 		if (cg_xui_scoreboard->integer)
 			cj_scoreboard.Apply();
 		else
