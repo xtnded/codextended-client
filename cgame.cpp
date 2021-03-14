@@ -54,8 +54,8 @@ void RGL_DrawChatText(std::string &msg, int x, int y) {
 }
 
 void CG_RenderChatMessages() {
-	cvar_t *x = Cvar_Get("cg_chat_x", "20", CVAR_ARCHIVE);
-	cvar_t *y = Cvar_Get("cg_chat_y", "60", CVAR_ARCHIVE);
+	cvar_t *x = Cvar_Get("cg_xui_chat_x", "20", CVAR_ARCHIVE);
+	cvar_t *y = Cvar_Get("cg_xui_chat_y", "60", CVAR_ARCHIVE);
 	int n = 0;
 	for (auto &i : chatmessages) {
 		
@@ -90,7 +90,7 @@ void myCG_ServerCommand(void) {
 	if (argc > 0) {
 		char* cmd = Cmd_Argv(0);
 		if (strlen(cmd) > 0) {
-			cvar_t *xui_alt_chat = Cvar_Get("cg_chat_alternative", "0", CVAR_ARCHIVE);
+			cvar_t *xui_alt_chat = Cvar_Get("cg_xui_chat", "0", CVAR_ARCHIVE);
 			if ((*cmd == 'h' || *cmd == 'i')) {
 				if (xui_alt_chat->integer) {
 					if (*cmd == 'i' || (*cmd == 'h' && !*(int*)CGAME_OFF(0x3029824C))) {

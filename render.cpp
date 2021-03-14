@@ -247,7 +247,7 @@ void RB_ShowImages() {
 	}
 	else {
 
-		cvar_t *xui_alt_chat = Cvar_Get("cg_chat_alternative", "0", CVAR_ARCHIVE);
+		cvar_t *xui_alt_chat = Cvar_Get("cg_xui_chat", "0", CVAR_ARCHIVE);
 
 		if (xui_alt_chat->integer) {
 			if (*cls_state > CA_CONNECTED) {
