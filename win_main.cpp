@@ -259,7 +259,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	void XUI_Init();
 	XUI_Init();
 
-	// fix: make discord optional!
 	void CL_DiscordInitialize();
 	CL_DiscordInitialize();
 

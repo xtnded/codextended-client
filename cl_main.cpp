@@ -260,7 +260,7 @@ void CL_Frame(int msec) {
 	if (clc_bWWWDl)
 		CL_WWWDownload();
 
-	void CL_DiscordFrame(); // Discord optional?
+	void CL_DiscordFrame();
 	CL_DiscordFrame();
 
 	CL_FOVLimit();
