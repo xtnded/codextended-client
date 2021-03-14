@@ -17,7 +17,9 @@ Goal of this project is to fix bugs from the original 1.1 client, add features t
 
 ## Usage
 
-Compile(as dev or release) - you need for that dependencies <br>
+Note! Your own build will not be the same as the officialy released patch! Some servers may prevent you from joining them when using a non-official build of Extended.
+
+Compile (you will need additional dependencies - libcurl, Discord RPC)<br>
 Rename old mss32.dll to miles32.dll<br>
 Copy newly compiled DLL to game directory and rename it to mss32.dll<br>
 ???<br>
