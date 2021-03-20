@@ -53,6 +53,9 @@ bool apply_hooks() {
 	__call(0x40A234, (int)Con_DrawSolidConsole);
 	__call(0x40A257, (int)Con_DrawSolidConsole);
 
+	// void Con_Dump();
+	// __call(0x408BBC, (int)Con_Dump);
+
 	void CL_Connect_f();
 	XUNLOCK((void*)0x41269B, 5);
 	*(UINT32*)(0x41269B + 1) = (int)CL_Connect_f;
