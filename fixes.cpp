@@ -22,6 +22,8 @@ bool fix_bugs() {
 	// NOP out the calls to CL_Motd (crash upon startup net not loaded and socket being sent or smth)
 	__nop(0x40F6DA, 0x40F6DA + 5);
 	__nop(0x4117B6, 0x4117B6 + 5);
+	
+	__nop(0x411815, 1);
 
 
 	/* annoying bugs */
