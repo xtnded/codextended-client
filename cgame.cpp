@@ -1,6 +1,8 @@
 #include "shared.h"
 #include "client.h"
 #include "render.h"
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 
 typedef enum {
 	CG_R_ADDREFENTITYTOSCREEN = 61,
@@ -58,8 +60,6 @@ void CG_RenderChatMessages() {
 	cvar_t *y = Cvar_Get("cg_xui_chat_y", "60", CVAR_ARCHIVE);
 	int n = 0;
 	for (auto &i : chatmessages) {
-		
-
 		RGL_DrawChatText(i.msg, x->integer, y->integer + 14 * n);
 		++n;
 	}
@@ -672,6 +672,46 @@ void CG_DrawDisconnect() {
 	}
 }
 
+void CG_DrawFPS(float y) {
+	cvar_t* xui_fps = Cvar_Get("cg_xui_fps", "0", CVAR_ARCHIVE);
+
+	if (xui_fps->integer) {
+		cvar_t* x = Cvar_Get("cg_xui_fps_x", "597", CVAR_ARCHIVE); // uh this x y values just look good with my hp bar
+		cvar_t* y = Cvar_Get("cg_xui_fps_y", "8", CVAR_ARCHIVE);
+
+		#define	FPS_FRAMES 4
+		static int previousTimes[FPS_FRAMES];
+		static int index;
+		int	i, total;
+		int	fps;
+		static int previous;
+		int	t, frameTime;
+
+		t = timeGetTime();
+		frameTime = t - previous;
+		previous = t;
+		previousTimes[index % FPS_FRAMES] = frameTime;
+		index++;
+
+		if (index > FPS_FRAMES) {
+			total = 0;
+			for (i = 0; i < FPS_FRAMES; i++) {
+				total += previousTimes[i];
+			}
+			if (!total) {
+				total = 1;
+			}
+			fps = 1000 * FPS_FRAMES / total;
+
+			M_DrawShadowString(x->integer, y->integer, 1, .20, vColorWhite, va("FPS: %d", fps), NULL, NULL, NULL);
+		}
+	} else {
+		void(*call)(float);
+		*(int*)&call = CGAME_OFF(0x30014A00);
+		call(y);
+	}
+}
+
 void CG_Init(DWORD base) {
 	cgame_mp = base;
 	CG_ServerCommand = (CG_ServerCommand_t)(cgame_mp + 0x2E0D0);
@@ -695,6 +735,8 @@ void CG_Init(DWORD base) {
 
 	__call(CGAME_OFF(0x300159CC), (int)CG_DrawDisconnect);
 	__call(CGAME_OFF(0x300159D4), (int)CG_DrawDisconnect);
+
+	__call(CGAME_OFF(0x3001509E), (int)CG_DrawFPS);
 
 	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
