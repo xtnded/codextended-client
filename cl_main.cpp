@@ -112,19 +112,9 @@ int dl_files_count = 0;
 void WWW_BeginDownload(void) {
 	char localTempName[MAX_PATH];
 	char remoteTempName[MAX_PATH];
-	int argc = Cmd_Argc();
 
 	if (clc_bWWWDl)
 		return;
-
-	if (argc > 1) {
-		const char* arg1 = Cmd_Argv(1);
-
-		if (!strstr(arg1, ".exe") != NULL) {
-			const char* error = va("Unauthorized download.");
-			Com_Error(ERR_DROP, error);
-		}
-	}
 
 	char *s;
 	char *remoteName, *localName;
@@ -203,17 +193,6 @@ void WWW_BeginDownload(void) {
 void X_CL_NextDownload(void) {
 	char* info = clc_stringData + clc_stringOffsets[1];
 	char *url = Info_ValueForKey(info, "sv_wwwBaseURL");
-
-	int argc = Cmd_Argc();
-
-	if (argc > 1) {
-		const char* arg1 = Cmd_Argv(1);
-
-		if (!strstr(arg1, ".exe") != NULL) {
-			const char* error = va("Unauthorized download.");
-			Com_Error(ERR_DROP, error);
-		}
-	}
 
 	if(cl_wwwDownload->integer && *url )
 		WWW_BeginDownload();
