@@ -87,6 +87,7 @@ static void MsgBox(const char *msg) {
 typedef enum {
 	COD_UNKNOWN,
 	COD_1,
+	COD_1_SP,
 	COD_5,
 	COD_5_SP_STEAM,
 	COD_5_STEAM, //steam version
@@ -107,6 +108,7 @@ typedef enum {
 static const char *codversion_strings[] = {
 	"UNKNOWN",
 	"1.1",
+	"1.1 SP",
 	"1.5",
 	"1.5 SP Steam",
 	"1.5 Steam",
