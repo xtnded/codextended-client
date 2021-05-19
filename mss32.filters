@@ -302,7 +302,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="detours.lib" />
-    <Library Include="libcurl.lib" />
+    <Library Include="libs/detours/detours.lib" />
+    <Library Include="libs/libcurl/libcurl.lib" />
+    <Library Include="libs/discord/discord-rpc.lib" />
   </ItemGroup>
 </Project>

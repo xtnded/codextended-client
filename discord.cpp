@@ -1,7 +1,8 @@
 #include "shared.h"
 #include "client.h"
-#include "dependencies/discord/discord_rpc.h"
-#include "dependencies/discord/discord_register.h"
+#pragma comment(lib, "libs/discord/discord-rpc.lib")
+#include "libs/discord/discord_rpc.h"
+#include "libs/discord/discord_register.h"
 
 // Reference: https://github.com/callofduty4x/CoD4x_Client_pub
 

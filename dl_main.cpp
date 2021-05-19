@@ -1,23 +1,19 @@
 #include "shared.h"
-
 #include "dl_public.h"
-
-#ifdef USE_CURL
-#pragma comment(lib, "dependencies/libcurl/libcurl.lib")
-
-#include "dependencies/libcurl/curl.h"
-#endif
+#include "client.h"
+#pragma comment(lib, "libs/libcurl/libcurl.lib")
+#include "libs/libcurl/curl.h"
+#include <iostream>
+#include "version.h"
 
 #define APP_NAME        "ID_DOWNLOAD"
 #define APP_VERSION     "2.0"
 
 // initialize once
 static int dl_initialized = 0;
-#ifdef USE_CURL
 static CURLM *dl_multi = NULL;
 static CURL *dl_request = NULL;
 FILE *dl_file = NULL;
-#endif
 
 bool clc_bWWWDl = false;
 
@@ -57,7 +53,6 @@ int create_progress_download(const char *url, FILE *fp, int (*progress_callback)
 }
 
 bool simple_download(const char *url, const char *local) {
-#ifdef USE_CURL
 	CURL *curl = NULL;
 	FILE *fp = NULL;
 	CURLcode res;
@@ -80,7 +75,6 @@ bool simple_download(const char *url, const char *local) {
 		curl_easy_cleanup(curl);
 		fclose(fp);
 	}
-#endif
 	return true;
 }
 
@@ -107,7 +101,6 @@ static int DL_cb_Progress(void *clientp, double dltotal, double dlnow, double ul
 }
 
 void DL_InitDownload() {
-#ifdef USE_CURL
 	if (dl_initialized) {
 		return;
 	}
@@ -118,7 +111,6 @@ void DL_InitDownload() {
 	dl_multi = curl_multi_init();
 	Com_Printf("Client download subsystem initialized\n");
 	dl_initialized = 1;
-#endif
 }
 
 /*
@@ -128,7 +120,6 @@ DL_Shutdown
 ================
 */
 void DL_Shutdown() {
-#ifdef USE_CURL
 	if (!dl_initialized) {
 		return;
 	}
@@ -138,7 +129,6 @@ void DL_Shutdown() {
 
 	curl_global_cleanup();
 	dl_initialized = 0;
-#endif
 }
 
 #define LOCAL_DL_PATH "dl.tmp"
@@ -147,7 +137,6 @@ char localDownloadName[MAX_PATH];
 
 int DL_BeginDownload(const char *localName, const char *remoteName, int debug) {
 	char referer[MAX_STRING_CHARS + 5 /*"ET://"*/];
-#ifdef USE_CURL
 	if (dl_request) {
 		Com_Printf("ERROR: DL_BeginDownload called with a download request already active\n"); \
 			return 0;
@@ -188,13 +177,12 @@ int DL_BeginDownload(const char *localName, const char *remoteName, int debug) {
 	curl_multi_add_handle(dl_multi, dl_request);
 
 	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName)); //spaces so whole link is visible now
-#endif
+	Cvar_Set("dlname_error", (char*)remoteName);
 	return 1;
 }
 
 // (maybe this should be CL_DL_DownloadLoop)
 dlStatus_t DL_DownloadLoop() {
-#ifdef USE_CURL
 	CURLMcode status;
 	CURLMsg *msg;
 	int dls = 0;
@@ -203,6 +191,16 @@ dlStatus_t DL_DownloadLoop() {
 	if (!dl_request) {
 		Com_DPrintf("DL_DownloadLoop: unexpected call with dl_request == NULL\n");
 		return DL_DONE;
+	}
+
+	if (*cls_state != CA_CONNECTING && *cls_state != CA_CHALLENGING && *cls_state != CA_CONNECTED) {
+		curl_multi_remove_handle(dl_multi, dl_request);
+		curl_easy_cleanup(dl_request);
+		fclose(dl_file);
+		dl_file = NULL;
+		dl_request = NULL;
+		Cvar_Set("ui_dl_running", "0");
+		return DL_DISCONNECTED;
 	}
 
 	if ((status = curl_multi_perform(dl_multi, &dls)) == CURLM_CALL_MULTI_PERFORM && dls) {
@@ -242,6 +240,6 @@ dlStatus_t DL_DownloadLoop() {
 	}
 
 	*localDownloadName = '\0';
-#endif
+	((void(*)())0x40F640)(); //CL_Reconnect_f
 	return DL_DONE;
 }

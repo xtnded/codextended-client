@@ -1,8 +1,8 @@
 #include "shared.h"
 #include "gl/gl.h"
 
-#pragma comment(lib, "detours.lib")
-#include "detours.h"
+#pragma comment(lib, "libs/detours/detours.lib")
+#include "libs/detours/detours.h"
 
 __int64 FileSize(std::string name)
 {
@@ -21,7 +21,8 @@ HMODULE WINAPI hLoadLibraryA(LPSTR lpFileName) {
 		return NULL;
 
 	HMODULE hModule = orig_LoadLibraryA(lpFileName);
-	DWORD pBase = (DWORD)GetModuleHandle( lpFileName );
+	DWORD pBase = (DWORD)GetModuleHandle(lpFileName);
+
 	if (!pBase)
 		return hModule;
 

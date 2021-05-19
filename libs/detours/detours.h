@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-//  File:       detours.h
-//  Module:     detours.lib
+//  File:       libs/detours/detours.h
+//  Module:     libs/detours/detours.lib
 //
 //  Detours for binary functions.  Version 1.5 (Build 46)
 //

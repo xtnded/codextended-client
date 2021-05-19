@@ -8,6 +8,8 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Shell32.lib")
 
+#define CURL_STATICLIB
+
 #include "targetver.h"
 #define __TITLE "Call of Duty Extended"
 

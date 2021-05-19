@@ -1,11 +1,10 @@
 #pragma once
 
-#define USE_CURL
-
 typedef enum {
 	DL_CONTINUE,
 	DL_DONE,
-	DL_FAILED
+	DL_FAILED,
+	DL_DISCONNECTED,
 } dlStatus_t;
 
 int DL_BeginDownload(const char *localName, const char *remoteName, int debug);
