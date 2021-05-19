@@ -18,6 +18,9 @@
 static void(*CL_AddReliableCommand)(const char *cmd) = (void(*)(const char*))0x40E2F0;
 static const char* (*CL_TranslateStringBuf)(const char *string) = (const char*(*)(const char*))0x4A9E20;
 
+#define cs0 (clc_stringData + clc_stringOffsets[0])
+#define cs1 (clc_stringData + clc_stringOffsets[1])
+
 static bool unlock_client_structure() {
 	__try {
 

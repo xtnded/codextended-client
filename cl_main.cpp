@@ -19,7 +19,7 @@ cvar_t *cl_findshader;
 
 cvar_t *cl_font_type;
 cvar_t *cg_drawheadnames;
-cvar_t *cg_xui_scoreboard;
+cvar_t *cg_xui_scoreboard; 
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
@@ -27,52 +27,6 @@ std::string res;
 
 #include <sstream>
 #include <cstdint>
-
-class KeyValuesBuilder
-{
-private:
-	std::stringstream m_buffer;
-
-	inline void PackBytes(const void* bytes, size_t size)
-	{
-		m_buffer << std::string(reinterpret_cast<const char*>(bytes), size);
-	}
-
-	inline void PackDataType(uint8_t type)
-	{
-		PackBytes(&type, 1);
-	}
-
-	inline void PackNullTerminated(const char* string)
-	{
-		PackBytes(string, strlen(string) + 1);
-	}
-
-public:
-	inline void PackString(const char* key, const char* value)
-	{
-		PackDataType(1);
-		PackNullTerminated(key);
-		PackNullTerminated(value);
-	}
-
-	inline void PackUint64(const char* key, uint64_t value)
-	{
-		PackDataType(7);
-		PackNullTerminated(key);
-		PackBytes(&value, sizeof(value));
-	}
-
-	inline void PackEnd()
-	{
-		PackDataType(8);
-	}
-
-	inline std::string GetString()
-	{
-		return m_buffer.str();
-	}
-};
 
 void CL_Connect_f() {
 	void(*o)() = (void(*)())0x40F6A0;
@@ -211,14 +165,12 @@ void CL_WWWDownload() {
 		clc_bWWWDl = false;
 		*cls_downloadRestart = 1;
 		CL_DownloadsComplete();
-	} else {
+	} else if (ret == DL_FAILED) {
 		// Perhaps actually check the response? Invalid URL, forbidden, etc?
-		const char* error = va("Download failure while getting %s.\nURL might be invalid.", Cvar_VariableString("cl_downloadName"));
+		const char* error = va("Download failure while getting %s.\nURL might be invalid.", Cvar_VariableString("dlname_error"));
 		Com_Error(ERR_DROP, error);
 		return;
 	}
-
-	// ((void(*)())0x40F640)(); // CL_Reconnect_f
 }
 
 void CL_InitDownloads() {
@@ -238,11 +190,16 @@ void CL_InitDownloads() {
 }
 
 void CL_FOVLimit() {
-	char* fov = Cvar_VariableString("cg_fov");
-	char* info = clc_stringData + clc_stringOffsets[1];
-	char* cheats = Info_ValueForKey(info, "sv_cheats");
-	if ((atoi(fov) < 80 || atoi(fov) > 95) && atoi(cheats) != 1) {
-		Com_Printf("cg_fov \"%s\" is invalid. Allowed values: \"80\" - \"95\".\n", fov);
+	int fov = Cvar_VariableIntegerValue("cg_fov");
+	int cheats = atoi(Info_ValueForKey(cs1, "sv_cheats"));
+
+	char* sv_fov_min = Info_ValueForKey(cs1, "sv_fov_min");
+	char* sv_fov_max = Info_ValueForKey(cs1, "sv_fov_max");
+	int fovMin = strlen(sv_fov_min) ? atoi(sv_fov_min) : 80;
+	int fovMax = strlen(sv_fov_max) ? atoi(sv_fov_max) : 95;
+
+	if ((fov < fovMin || fov > fovMax) && cheats != 1) {
+		Com_Printf("cg_fov \"%d\" is invalid. Allowed values: \"%d\" - \"%d\".\n", fov, fovMin, fovMax);
 		Cvar_Set("cg_fov", "80");
 	}
 }
@@ -271,9 +228,7 @@ void CL_Frame(int msec) {
 int *whiteShader = (int*)0x15CA630;
 
 void CL_Init(void) {
-
 	bool fix_bugs();
-
 	if (!fix_bugs()) {
 		MsgBox("failed to fix bugs in default cod1");
 		Com_Quit_f();
@@ -301,6 +256,11 @@ void CL_Init(void) {
 	Cvar_Get("g_scoreboard_kills", "Kills", 0);
 	Cvar_Get("g_scoreboard_deaths", "Deaths", 0);
 	Cvar_Get("g_scoreboard_ping", "Ping", 0);
+	Cvar_Set("r_overbrightbits", "0");
+	Cvar_Set("r_ignorehwgamma", "0");
+	Cvar_Set("cl_languagewarnings", "0");
+	Cvar_Set("cl_languagewarningsaserrors", "0");
+	Cvar_Set("com_hunkmegs", "512");
 
 	#if 0
 		// None of these seem to work.

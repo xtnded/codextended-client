@@ -289,6 +289,7 @@ char* Cvar_VariableString(const char*);
 void Q_strncpyz(char *dest, const char *src, int destsize);
 void Com_sprintf(char *dest, int size, const char *fmt, ...);
 char* Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize);
+int Cvar_VariableIntegerValue(const char* var_name);
 
 static void(*Cmd_ArgvBuffer)(int, char*, int) = (void(*)(int, char*, int))0x4285E0;
 char* Cmd_Argv(int index);
