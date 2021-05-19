@@ -19,14 +19,14 @@ void codextended() {
 
 	if (!determine_cod_version()) {
 		if (!find_cod_version()) {
-			MsgBox("Failed to find Call of Duty version, please report this at http://xtnded.org");
+			MsgBox("Failed to find Call of Duty version, please report this at www.cod1x.eu.");
 			return;
 		}
 	}
 
 #ifdef ENABLE_CODX
 	if (!apply_hooks()) {
-		MsgBox("Failed to initialize CoDExtended, please report this at http://xtnded.org\n");
+		MsgBox("Failed to initialize CoDExtended, please report this at www.cod1x.eu.\n");
 		Com_Quit_f();
 	}
 
