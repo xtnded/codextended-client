@@ -19,7 +19,7 @@ cvar_t *cl_findshader;
 
 cvar_t *cl_font_type;
 cvar_t *cg_drawheadnames;
-cvar_t *cg_xui_scoreboard; 
+cvar_t *cg_xui_scoreboard;
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
@@ -204,6 +204,23 @@ void CL_FOVLimit() {
 	}
 }
 
+void CL_FPSLimit() {
+	char* fps = Cvar_VariableString("com_maxfps");
+	if (atoi(fps) < 30 || atoi(fps) > 333) {
+		Com_Printf("com_maxfps \"%s\" is invalid. Allowed values: \"30\" - \"333\".\n", fps);
+		Cvar_Set("com_maxfps", "60");
+	}
+}
+
+void Disconnect_IfEsc() {
+	if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING || *cls_state == CA_CONNECTED) {
+		if (GetFocus() && GetKeyState(VK_ESCAPE) & 0x8000)
+		{
+			((void(*)())0x40F5F0)(); //CL_Disconnnect 
+		}
+	}
+}
+
 void CL_Frame(int msec) {
 	void(*call)(int);
 	*(DWORD*)&call = 0x411280;
@@ -221,6 +238,8 @@ void CL_Frame(int msec) {
 	CL_DiscordFrame();
 
 	CL_FOVLimit();
+	CL_FPSLimit();
+	Disconnect_IfEsc();
 
 	call(msec);
 }
