@@ -42,6 +42,9 @@ void Discord_StatusPlaying() {
 	char* mapname_p = Info_ValueForKey(info, "mapname");
 	char mapname[64] = { 0 };
 	Q_strncpyz(mapname, mapname_p, sizeof(mapname));
+	char* mapnameClean_p = Info_ValueForKey(info, "mapname");
+	char mapnameClean[64] = { 0 };
+	Q_strncpyz(mapnameClean, mapnameClean_p, sizeof(mapnameClean));
 	char* gametype_p = Info_ValueForKey(info, "g_gametype");
 	char gametype[64] = { 0 };
 	Q_strncpyz(gametype, gametype_p, sizeof(gametype));
@@ -49,14 +52,10 @@ void Discord_StatusPlaying() {
 	DiscordRichPresence discordPresence;
 	memset(&discordPresence, 0, sizeof(discordPresence));
 
-	const char* GametypeName(char* l, bool colors);
-	discordPresence.state = GametypeName(gametype, false);
-
-	char* CL_ClearHostname(char* hostname, bool colors);
-	discordPresence.details = CL_ClearHostname(hostname, false);
-
+	discordPresence.state = Com_GametypeName(gametype, false);
+	discordPresence.details = Com_CleanHostname(hostname, false);
 	discordPresence.largeImageKey = mapname;
-	discordPresence.largeImageText = mapname;
+	discordPresence.largeImageText = Com_CleanMapname(mapnameClean); // for some reason this needs a whole new buffer
 
 	// Discord_SetJoinSecret();
 	// discordPresence.partyId = discordData.partyId;

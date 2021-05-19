@@ -245,56 +245,6 @@ void __declspec(naked) InterceptCallToShutdownUI() {
 	}
 }
 
-char* GetStockGametypeName(char* gt) {
-	char s[64] = { 0 };
-	Q_strncpyz(s, gt, sizeof(s));
-
-	if (!strcmp(s, "dm"))
-		return "Deathmatch";
-	else if (!strcmp(s, "tdm"))
-		return "Team Deathmatch";
-	else if (!strcmp(s, "re"))
-		return "Retrieval";
-	else if (!strcmp(s, "bel"))
-		return "Behind Enemy Lines";
-	else if (!strcmp(s, "sd"))
-		return "Search & Destroy";
-
-	return false;
-}
-
-char* GetTxtGametypeName(char* gt, bool colors) {
-	char* name;
-	char* file = va("maps/mp/gametypes/%s.txt", gt);
-	FS_ReadFile(file, (void**)&name);
-
-	if (!name) return false;
-
-	// Reimplementation of Q_CleanStr (remove quotes too).
-	char *d = name, *s = name;
-	int c;
-	while ((c = *s) != 0) {
-		if (Q_IsColorString(s) && !colors) s++;
-		else if (c >= 0x20 && c <= 0x7E && c != 0x22) *d++ = c;
-		s++;
-	}
-	*d = '\0';
-
-	return name;
-}
-
-const char* GametypeName(char* gt, bool colors = false) { // Keep colors for loading screen, remove for RPC.
-	if (!gt || !*gt) return "Unknown Gametype";
-
-	char* name = GetStockGametypeName(gt);
-	if (!name) name = GetTxtGametypeName(gt, colors);
-
-	if (name)
-		return name;
-	else
-		return (colors) ? gt : Q_CleanStr(gt);
-}
-
 void UI_DrawConnectScreen(int overlay) {
 #define TEXT_WIDTH 8
 #define TEXT_HEIGHT 16
@@ -312,26 +262,12 @@ void UI_DrawConnectScreen(int overlay) {
 		char *mapname_p = Info_ValueForKey(info, "mapname");
 		char mapname[64] = { 0 };
 		Q_strncpyz(mapname, mapname_p, sizeof(mapname));
-		char *mappath = va("levelshots/%s.tga\n", mapname);
+		char *mappath = va("levelshots/%s.tga", mapname);
 		int mapshader = RE_RegisterShaderNoMip(mappath);
 		if (!mapshader)
 			mapshader = RE_RegisterShaderNoMip("menu/art/unknownmap");
-		bool f = false;
-		for (int i = 0; szStockMaps[i]; i++) {
-			if (Q_stricmp(szStockMaps[i], mapname)) {
-				f = true;
-				break;
-			}
-		}
-		if (!f)
-			SCR_DrawPic(0, 0, 640, 512, mapshader);
-		else
-			SCR_DrawPic(0, 0, 640, 512, mapshader);
 
-		if (f) {
-			mapname_p = mapname + 3;
-			*mapname_p = toupper(*mapname_p);
-		}
+		SCR_DrawPic(0, 0, 640, 512, mapshader);
 
 		vec4_t opacity = { .3,.3,.3, .88 };
 
@@ -351,7 +287,7 @@ void UI_DrawConnectScreen(int overlay) {
 			RE_SetColor(opacity);
 			SCR_DrawPic(0, 400, frac * 640, LOAD_BAR_HEIGHT, *whiteShader);
 			RE_SetColor(NULL);
-			char *cstring = va("%s - %s", mapname_p, GametypeName(gametype, true));
+			char *cstring = va("%s - %s", Com_CleanMapname(mapname_p), Com_GametypeName(gametype, true));
 			int clen = CG_DrawStrlen(cstring) * 12;
 			SCR_DrawString(320 - clen / 2, 400 + 30, 1, .6, colorWhite, cstring, NULL, NULL, NULL);
 		}
@@ -445,7 +381,7 @@ void UI_Init(DWORD base) {
 	__jmp(UI_FILE_OFF(0x4000A5F0), (int)UI_RunMenuScript);
 	__call(UI_FILE_OFF(0x400076BE), (int)_UI_Init);
 
-	__call(UI_FILE_OFF(0x4000AA55), (int)UI_StartServerRefresh);
+	// __call(UI_FILE_OFF(0x4000AA55), (int)UI_StartServerRefresh);
 
 	cvar_t* xui_connect = Cvar_Get("cg_xui_connect", "0", CVAR_ARCHIVE);
 	if (xui_connect->integer) {

@@ -285,11 +285,11 @@ extern Cvar_Get_t Cvar_Get;
 extern Cvar_FindVar_t Cvar_FindVar;
 
 char* Cvar_VariableString(const char*);
+char* Cvar_VariableStringBuffer(const char* var_name, char* buffer, int bufsize);
+int Cvar_VariableIntegerValue(const char* var_name);
 
 void Q_strncpyz(char *dest, const char *src, int destsize);
 void Com_sprintf(char *dest, int size, const char *fmt, ...);
-char* Cvar_VariableStringBuffer(const char *var_name, char *buffer, int bufsize);
-int Cvar_VariableIntegerValue(const char* var_name);
 
 static void(*Cmd_ArgvBuffer)(int, char*, int) = (void(*)(int, char*, int))0x4285E0;
 char* Cmd_Argv(int index);
@@ -297,6 +297,7 @@ int Cmd_Argc();
 
 void Info_SetValueForKey(char *s, const char *key, const char *value);
 char *Info_ValueForKey(const char *s, const char *key);
+void Info_NextPair(const char** head, char* key, char* value);
 
 extern DWORD game_mp;
 extern DWORD cgame_mp;
@@ -350,3 +351,7 @@ void MSG_Init(msg_t *buf, byte *data, int length);
 
 char* trimSpaces(char* str);
 char* Q_CleanStr(char* string, bool colors = false);
+
+char* Com_CleanHostname(char* hostname, bool colors);
+char* Com_CleanMapname(char* mapname);
+const char* Com_GametypeName(char* gt, bool colors = false);
