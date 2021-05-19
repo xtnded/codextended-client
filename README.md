@@ -1,7 +1,7 @@
 # Call of Duty Extended [Client]
 
-CoDExtended Client, also known as CoD 1.1x, is a client-side (for players) modification for Call of Duty 1 1.1.
-Goal of this project is to fix bugs from the originalclient, add features that are present in newer, but less popular patches, and also to add some of our own unique features (e.g. Discord RPC, CoD 4-like UI elements).
+CoDExtended Client, also known as CoD 1.1x, is a client-side modification (mod for players) for Call of Duty 1 1.1.
+Goal of this project is to fix bugs from the original client, add features that are present in newer, but less popular patches, and also to add some of our own unique features (e.g. Discord RPC, CoD 4-like UI elements).
 
 ## Changes/additions
 
