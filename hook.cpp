@@ -37,6 +37,12 @@ bool apply_hooks() {
 	
 	if (codversion != COD_1)
 		return true;
+	
+	   #define PATCH_PUSH_STRING_PTR_VALUE(offset, new_str) \
+	XUNLOCK((void*)offset, 10); \
+	*(const char **)(offset + 1) = new_str;
+
+	PATCH_PUSH_STRING_PTR_VALUE(0x50847D, "Call of Duty 1.1x Multiplayer");
 
 	__call(0x46319B, (int)sub_40E2B0); //cleanup exit
 
