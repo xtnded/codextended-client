@@ -298,6 +298,10 @@ void CL_Init(void) {
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
 	Cvar_Set("shortversion", "1.1x");
 
+	Cvar_Get("g_scoreboard_kills", "Kills", 0);
+	Cvar_Get("g_scoreboard_deaths", "Deaths", 0);
+	Cvar_Get("g_scoreboard_ping", "Ping", 0);
+
 	#if 0
 		// None of these seem to work.
 		char*(__fastcall*CL_TranslateString)(const char *string, char *buf, int);

@@ -30,10 +30,10 @@ CG_ServerCommand_t CG_ServerCommand;
 const char* disliked_vars[] = { 
 "r_showimages",
 "name",
-"cl_allowdownload", 
-"version", 
-"cg_norender", 
-"cl_avidemo", 
+"cl_allowdownload",
+"version",
+"cg_norender",
+"cl_avidemo",
 NULL };
 
 DWORD cgame_mp;
@@ -122,6 +122,7 @@ void myCG_ServerCommand(void) {
 			} else if (*cmd == 'v') {
 				if (argc > 1) {
 					char* var = Cmd_Argv(1);
+
 					for (int i = 0; disliked_vars[i]; i++) {
 						if (!strcmp(disliked_vars[i], var))
 							return; // kindly fuck off please (c) php
@@ -395,8 +396,8 @@ int CG_DrawScoreboard() {
 #define BANNER_WIDTH 372
 
 #define BAR_OPACITY .2
-#define BAR_HEIGHT 20
-#define BAR_WIDTH 320 + 50
+#define BAR_HEIGHT 15
+#define BAR_WIDTH 320 + 45
 #define BAR_PAD 5
 
 	int base_x = 160 - 50;
@@ -410,8 +411,18 @@ int CG_DrawScoreboard() {
 	ParseVector(Cvar_VariableString("g_TeamColor_Allies"), teamcolor_allies);
 	ParseVector(Cvar_VariableString("g_TeamColor_Axis"), teamcolor_axis);
 
-	char *teamname_allies = Cvar_VariableString("g_TeamName_Allies");
+	char *teamname_allies = Cvar_VariableString("g_TeamName_Allies"); 
 	char *teamname_axis = Cvar_VariableString("g_TeamName_Axis");
+
+	if (strstr(teamname_allies, "AMERICAN") != NULL)
+		Cvar_Set("g_TeamName_Allies", "American");
+	else if (strstr(teamname_allies, "RUSSIAN") != NULL)
+		Cvar_Set("g_TeamName_Allies", "Russian");
+	else if (strstr(teamname_allies, "BRITISH") != NULL)
+		Cvar_Set("g_TeamName_Allies", "British");
+
+	if (strstr(teamname_axis, "GERMAN") != NULL)
+		Cvar_Set("g_TeamName_Axis", "German");
 
 	if (!*teamname_allies)
 		teamname_allies = "Allies";
@@ -461,9 +472,9 @@ int CG_DrawScoreboard() {
 
 				SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, g_ScoresBanner_None);
 				M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("Players ( %d )", num_players - num_spectators), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, "Kills", NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, "Deaths", NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .3, vColorWhite, "Ping", NULL, NULL, NULL);
+				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_kills"), NULL, NULL, NULL);
+				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_deaths"), NULL, NULL, NULL);
+				M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_ping"), NULL, NULL, NULL);
 
 				base_y += 5;
 			}
@@ -483,8 +494,9 @@ int CG_DrawScoreboard() {
 				RE_SetColor(teamcolor_none);
 				SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
 				RE_SetColor(vColorWhite);
+				if (csi->statusicon)
 				SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-				M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
+				M_DrawShadowString(base_x + BAR_HEIGHT , base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
 				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
 				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
 				M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
@@ -538,9 +550,9 @@ int CG_DrawScoreboard() {
 
 					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, banner1);
 					M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("%s ( %d )", teamname1, teamcount1), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, "Kills", NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, "Deaths", NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .3, vColorWhite, "Ping", NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_kills"), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_deaths"), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_ping"), NULL, NULL, NULL);
 
 					base_y += 5;
 				}
@@ -560,11 +572,12 @@ int CG_DrawScoreboard() {
 					RE_SetColor(teamcolor1);
 					SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
 					RE_SetColor(vColorWhite);
+					if (csi->statusicon)
 					SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-					M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
+					M_DrawShadowString(base_x + BAR_HEIGHT , base_y + 10, 1, .15, vColorWhite, ci->name, NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
 					base_y += BAR_HEIGHT + BAR_PAD;
 				}
 				RE_SetColor(NULL);
@@ -595,11 +608,12 @@ int CG_DrawScoreboard() {
 					RE_SetColor(teamcolor2);
 					SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
 					RE_SetColor(vColorWhite);
+					if (csi->statusicon)
 					SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-					M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
+					M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 10, 1, .15, vColorWhite, ci->name, NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
+					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
 					base_y += BAR_HEIGHT + BAR_PAD;
 				}
 				RE_SetColor(NULL);
@@ -633,6 +647,7 @@ int CG_DrawScoreboard() {
 			RE_SetColor(color_spectator_bar_bg);
 			SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
 			RE_SetColor(vColorWhite);
+			if (csi->statusicon)
 			SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
 			M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
 			base_y += BAR_HEIGHT + BAR_PAD;
@@ -673,7 +688,7 @@ void CG_DrawDisconnect() {
 }
 
 void CG_DrawFPS(float y) {
-	cvar_t* xui_fps = Cvar_Get("cg_xui_fps", "0", CVAR_ARCHIVE);
+	cvar_t* xui_fps = Cvar_Get("cg_xui_fps", "1", CVAR_ARCHIVE);
 
 	if (xui_fps->integer) {
 		cvar_t* x = Cvar_Get("cg_xui_fps_x", "597", CVAR_ARCHIVE); // uh this x y values just look good with my hp bar
