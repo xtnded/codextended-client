@@ -275,6 +275,8 @@ void CL_Init(void) {
 	Cvar_Get("g_scoreboard_kills", "Kills", 0);
 	Cvar_Get("g_scoreboard_deaths", "Deaths", 0);
 	Cvar_Get("g_scoreboard_ping", "Ping", 0);
+	Cvar_Get("cg_x_obituary", "1", 0);
+
 	Cvar_Set("r_overbrightbits", "0");
 	Cvar_Set("r_ignorehwgamma", "0");
 	Cvar_Set("cl_languagewarnings", "0");

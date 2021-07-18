@@ -727,6 +727,79 @@ void CG_DrawFPS(float y) {
 	}
 }
 
+typedef enum {
+	TR_STATIONARY,
+	TR_INTERPOLATE,             // non-parametric, but interpolate between snapshots
+	TR_LINEAR,
+	TR_LINEAR_STOP,
+	TR_LINEAR_STOP_BACK,        //----(SA)	added.  so reverse movement can be different than forward
+	TR_SINE,                    // value = base + sin( time / duration ) * delta
+	TR_GRAVITY,
+	// Ridah
+	TR_GRAVITY_LOW,
+	TR_GRAVITY_FLOAT,           // super low grav with no gravity acceleration (floating feathers/fabric/leaves/...)
+	TR_GRAVITY_PAUSED,          //----(SA)	has stopped, but will still do a short trace to see if it should be switched back to TR_GRAVITY
+	TR_ACCELERATE,
+	TR_DECCELERATE,
+	// Gordon
+	TR_SPLINE,
+	TR_LINEAR_PATH
+} trType_t;
+
+typedef struct {
+	trType_t trType;
+	int trTime;
+	int trDuration;             // if non 0, trTime + trDuration = stop time
+//----(SA)	removed
+	vec3_t trBase;
+	vec3_t trDelta;             // velocity, etc
+//----(SA)	removed
+} trajectory_t;
+
+typedef struct entityState_s {
+	int number;
+	entityTypes eType; //4
+	int eFlags; //8
+	trajectory_t pos; //12
+	trajectory_t apos; //48
+	int unk; //84 //time??
+	int unk2; //88 //time2??
+	vec3_t origin2; //92
+	vec3_t angles2; //104 (guessed name)
+	int otherEntityNum; //116
+	int otherEntityNum2; //120
+	int groundEntityNum; //124
+	int constantLight; //128
+	int loopSound; //132
+	int surfaceFlags; //136
+	int modelindex; //140
+	int clientNum; //144
+	char ___cba[0x34];
+	/*
+	gentity_t *teammaster; //152
+	int eventParm; //160
+	int eventSequence; //164
+	int events[4]; //168
+	int eventParms[4]; //184
+	*/
+
+	int weapon; //200
+	int legsAnim; //204
+	int torsoAnim; //208
+	float leanf; //212
+	int loopfxid; //216
+	int hintstring; //220
+	int animMovetype; //224
+} entityState_t;
+
+void CG_Obituary(entityState_t* ent) {
+	if (!Cvar_VariableIntegerValue("cg_x_obituary")) return;
+
+	void(*call)(entityState_t*);
+	*(int*)(&call) = CGAME_OFF(0x3001D6C0);
+	call(ent);
+}
+
 void CG_Init(DWORD base) {
 	cgame_mp = base;
 	CG_ServerCommand = (CG_ServerCommand_t)(cgame_mp + 0x2E0D0);
@@ -752,6 +825,8 @@ void CG_Init(DWORD base) {
 	__call(CGAME_OFF(0x300159D4), (int)CG_DrawDisconnect);
 
 	__call(CGAME_OFF(0x3001509E), (int)CG_DrawFPS);
+
+	__call(CGAME_OFF(0x3001E6A1), (int)CG_Obituary);
 
 	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
