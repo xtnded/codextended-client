@@ -57,6 +57,12 @@ void Discord_StatusPlaying() {
 	discordPresence.largeImageKey = mapname;
 	discordPresence.largeImageText = Com_CleanMapname(mapnameClean); // for some reason this needs a whole new buffer
 
+	int player_count = *(int*)CGAME_OFF(0x3020B9FC);
+	if(player_count > 0 && player_count < 65) {
+		discordPresence.partySize = player_count;
+		discordPresence.partyMax = atoi(Info_ValueForKey(info, "sv_maxclients"));
+	}
+	
 	// Discord_SetJoinSecret();
 	// discordPresence.partyId = discordData.partyId;
 	// discordPresence.partySize = 1;
