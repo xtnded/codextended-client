@@ -13,13 +13,13 @@ cvar_t *cl_running;
 cvar_t *clientname;
 cvar_t *cl_wwwDownload;
 cvar_t *cl_allowDownload;
-
 cvar_t *cl_console_fraction;
 cvar_t *cl_findshader;
-
 cvar_t *cl_font_type;
+
 cvar_t *cg_drawheadnames;
 cvar_t *cg_xui_scoreboard;
+cvar_t *cg_fov;
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
@@ -267,6 +267,7 @@ void CL_Init(void) {
 	cl_font_type = Cvar_Get("cl_font_type", "1", CVAR_ARCHIVE);
 	cg_drawheadnames = Cvar_Get("cg_drawheadnames", "0", 0);
 	cg_xui_scoreboard = Cvar_Get("cg_xui_scoreboard", "0", 0);
+	cg_fov = Cvar_Get("cg_fov", "80", CVAR_ARCHIVE);
 
 	Cvar_Get("xtndedbuild", va("%i", BUILDNUMBER), CVAR_USERINFO | CVAR_ROM);
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
