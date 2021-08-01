@@ -269,7 +269,6 @@ void CL_Init(void) {
 	cg_xui_scoreboard = Cvar_Get("cg_xui_scoreboard", "0", 0);
 	cg_fov = Cvar_Get("cg_fov", "80", CVAR_ARCHIVE);
 
-	Cvar_Get("xtndedbuild", va("%i", BUILDNUMBER), CVAR_USERINFO | CVAR_ROM);
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
 	Cvar_Set("shortversion", "1.1x");
 
