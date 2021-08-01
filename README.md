@@ -1,7 +1,6 @@
 # Call of Duty Extended [Client]
 
-CoDExtended Client, also known as CoD 1.1x, is a client-side modification (mod for players) for Call of Duty 1 1.1.
-Goal of this project is to fix bugs from the original client, add features that are present in newer, but less popular patches, and also to add some of our own unique features (e.g. Discord RPC, CoD 4-like UI elements).
+CoDExtended Client (1.1x), is a client-side modification for Call of Duty 1 1.1.
 
 ## Changes/additions
 
@@ -13,22 +12,21 @@ Goal of this project is to fix bugs from the original client, add features that 
 - unlocked FOV
 - bugfixes
 
-## Notice
+## Building from source
 
-The public version does not include automatic updates or anticheat, but also prevents you from joining certain servers which enforce official 1.1x.
-
-## Usage
-
-Compile with Visual Studio<br>
+Build with Visual Studio<br>
 Rename old mss32.dll to miles32.dll<br>
 Copy newly compiled DLL to game directory and rename it to mss32.dll<br>
 ???<br>
 PROFIT<br>
 
-## Questions
+## Notice
 
-Forum: http://xtnded.org (outdated)<br>
-Discord: http://discord.cod1x.eu<br>
+The official 1.1x source code is private. This build will not let you play on 1.1x-enforced servers.  
+If you wish to add your own features, add your features with a pull request so we can include them in the next official release.
+
+Forum: http://xtnded.org  
+Discord: http://discord.cod1x.eu  
 
 ## License
 
