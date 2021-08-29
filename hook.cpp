@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "shared.h"
 #include "client.h"
+#include "stdafx.h"
 
 //0046319B E8 10 B1 FA FF                                      call    sub_40E2B0
 void sub_40E2B0() {
@@ -25,6 +26,11 @@ void Main_UnprotectModule(HMODULE hModule)
 }
 
 bool apply_hooks() {
+
+	// allow alt tab - set dwExStyle from WS_EX_TOPMOST to WS_EX_LEFT (default), which allows minimizing
+	XUNLOCK((void*)0x5083b1, 1);
+	memset((void*)0x5083b1, 0x00, 1);
+	
 	HMODULE hModule;
 	if (SUCCEEDED(GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)apply_hooks, &hModule)))
 	{
