@@ -316,11 +316,3 @@ void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after cons
 char* __cdecl CL_SetServerInfo_HostnameStrncpy(char* a1, char* a2, size_t a3) {
 	return strncpy(a1, Com_CleanHostname(a2, true), a3);
 }
-
-int Com_EventLoop(void) {
-    int(*original)(void) = (int(*)(void)) 0x436580;
-
-    *(int*)0x4365C7 = 131072; //changed from 16k to 128k //16384 to 131072
-
-    return original(); //let's call the original and then modify the limit
-}
