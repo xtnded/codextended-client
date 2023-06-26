@@ -334,6 +334,7 @@ void APIENTRY qglBindTexture(GLenum target, GLuint texture) {
 	glBindTexture(target, texture);
 }
 
+/*
 void __stdcall RB_BeginSurface() {
 	shader_t* shader;
 	__asm {
@@ -353,6 +354,7 @@ void __stdcall RB_BeginSurface() {
 	}
 	call();
 }
+*/
 
 static GLfloat rot = 0.0;
 static time_t rot_time = 0;

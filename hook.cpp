@@ -112,6 +112,7 @@ bool apply_hooks() {
 	__call(0x4D87F5, (int)RB_ShowImages);
 	__nop(0x4D87F0, 5); //cmp and jz for r_showImages->integer
 
+	/*
 	void __stdcall RB_BeginSurface(); // crashes?
 	__call(0x4D4A2C, (int)RB_BeginSurface);
 	__call(0x4D6886, (int)RB_BeginSurface);
@@ -133,6 +134,7 @@ bool apply_hooks() {
 	__call(0x511067, (int)RB_BeginSurface);
 	__call(0x511D85, (int)RB_BeginSurface);
 	__call(0x51269B, (int)RB_BeginSurface);
+	*/
 
 	void* ri_Hunk_AllocAlign(int size);
 	XUNLOCK((void*)0x4FD6AF, 6);
