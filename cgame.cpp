@@ -155,42 +155,38 @@ void pm_aimflag() {
 }
 
 extern cvar_t* cg_zoomSensitivity_ratio;
-void scaleSensitivityAds()
+void sensitivityRatioAds()
 {
-	//Com_Printf("^1 scaleSensitivityAds \n");
+	//Stock cg_zoomSensitivity = fov_visible_percentage / cg_fov_value //See instruction 30032fe8
+	//ADS check done using FUN_30032e20
 
-	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);
-
-	float* fov_visible_percentage = (float*)CGAME_OFF(0x3020958c); //VISIBLE PERCENTAGE OF CG_FOV VALUE 
+	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);		//zoomSensitivity var of cg_t struct
+	float* fov_visible_percentage = (float*)CGAME_OFF(0x3020958c);	//Visible percentage of cg_fov value
 	float* cg_fov_value = (float*)CGAME_OFF(0x30298c68);
-	float stock_cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
-
-	float* ads_anim_progress = (float*)CGAME_OFF(0x30207214);
-	int* ads = (int*)CGAME_OFF(0x30209458); //CAN'T BE USED ALONE
-
-	if (*ads_anim_progress == 1)
+	
+	float* ads_anim_progress = (float*)CGAME_OFF(0x30207214);		//From 0 to 1
+	if (*ads_anim_progress == 1) //ADS animation completed
 	{
-		//ADS ANIMATION DONE
-		*cg_zoomSensitivity = (stock_cg_zoomSensitivity * cg_zoomSensitivity_ratio->value);
+		*cg_zoomSensitivity = ((*fov_visible_percentage / *cg_fov_value) * cg_zoomSensitivity_ratio->value);
 	}
-	else if (*ads_anim_progress != 0)
+	else if (*ads_anim_progress != 0) //ADS animation in progress
 	{
-		//ADS ANIMATION IN PROGRESS
-		if (*ads == 0)
+		bool* ads = (bool*)CGAME_OFF(0x30209458);
+		if (*ads)
 		{
-			//NOT ADS
-			*cg_zoomSensitivity = stock_cg_zoomSensitivity;
+			//ADS
+			*cg_zoomSensitivity = ((*fov_visible_percentage / *cg_fov_value) * cg_zoomSensitivity_ratio->value);
 		}
 		else
 		{
-			//ADS
-			*cg_zoomSensitivity = (stock_cg_zoomSensitivity * cg_zoomSensitivity_ratio->value);
+			//NOT ADS
+			*cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
 		}
 	}
 	else if (*ads_anim_progress == 0)
 	{
 		//NOT ADS
-		*cg_zoomSensitivity = stock_cg_zoomSensitivity;
+		*cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
 	}
 
 	__asm
@@ -874,7 +870,7 @@ void CG_Init(DWORD base) {
 
 	__call(CGAME_OFF(0x3001E6A1), (int)CG_Obituary);
 
-	__jmp(CGAME_OFF(0x30032fe8), (int)scaleSensitivityAds); // FSTP dword ptr [DAT_3020b5f4]
+	__jmp(CGAME_OFF(0x30032fe8), (int)sensitivityRatioAds);
 
 	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
