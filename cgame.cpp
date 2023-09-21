@@ -154,6 +154,52 @@ void pm_aimflag() {
 	call();
 }
 
+extern cvar_t* cg_zoomSensitivity_ratio;
+void scaleSensitivityAds()
+{
+	//Com_Printf("^1 scaleSensitivityAds \n");
+
+	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);
+
+	float* fov_visible_percentage = (float*)CGAME_OFF(0x3020958c); //VISIBLE PERCENTAGE OF CG_FOV VALUE 
+	float* cg_fov_value = (float*)CGAME_OFF(0x30298c68);
+	float stock_cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
+
+	float* ads_anim_progress = (float*)CGAME_OFF(0x30207214);
+	int* ads = (int*)CGAME_OFF(0x30209458); //CAN'T BE USED ALONE
+
+	if (*ads_anim_progress == 1)
+	{
+		//ADS ANIMATION DONE
+		*cg_zoomSensitivity = (stock_cg_zoomSensitivity * cg_zoomSensitivity_ratio->value);
+	}
+	else if (*ads_anim_progress != 0)
+	{
+		//ADS ANIMATION IN PROGRESS
+		if (*ads == 0)
+		{
+			//NOT ADS
+			*cg_zoomSensitivity = stock_cg_zoomSensitivity;
+		}
+		else
+		{
+			//ADS
+			*cg_zoomSensitivity = (stock_cg_zoomSensitivity * cg_zoomSensitivity_ratio->value);
+		}
+	}
+	else if (*ads_anim_progress == 0)
+	{
+		//NOT ADS
+		*cg_zoomSensitivity = stock_cg_zoomSensitivity;
+	}
+
+	__asm
+	{
+		fstp st(0)
+		retn
+	}
+}
+
 #define cg_crosshairClientNum (*(int*)CGAME_OFF(0x3020C8C8))
 #define cg_renderingThirdPerson (*(int*)CGAME_OFF(0x30207158))
 
@@ -827,6 +873,8 @@ void CG_Init(DWORD base) {
 	__call(CGAME_OFF(0x3001509E), (int)CG_DrawFPS);
 
 	__call(CGAME_OFF(0x3001E6A1), (int)CG_Obituary);
+
+	__jmp(CGAME_OFF(0x30032fe8), (int)scaleSensitivityAds); // FSTP dword ptr [DAT_3020b5f4]
 
 	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
 	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
