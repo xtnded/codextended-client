@@ -155,19 +155,21 @@ void pm_aimflag() {
 }
 
 extern cvar_t* cg_zoomSensitivity_ratio;
-void sensitivityRatioAds()
+float stockCgZoomSensitivity()
 {
-	//Stock cg_zoomSensitivity = fov_visible_percentage / cg_fov_value //See instruction 30032fe8
-	//ADS check done using FUN_30032e20
-
-	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);		//zoomSensitivity var of cg_t struct
 	float* fov_visible_percentage = (float*)CGAME_OFF(0x3020958c);	//Visible percentage of cg_fov value
 	float* cg_fov_value = (float*)CGAME_OFF(0x30298c68);
-	
+	return (*fov_visible_percentage / *cg_fov_value);				//See instruction 30032fe8
+}
+void sensitivityRatioAds()
+{
+	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);		//zoomSensitivity var of cg_t struct
 	float* ads_anim_progress = (float*)CGAME_OFF(0x30207214);		//From 0 to 1
+	//See FUN_30032e20
 	if (*ads_anim_progress == 1) //ADS animation completed
 	{
-		*cg_zoomSensitivity = ((*fov_visible_percentage / *cg_fov_value) * cg_zoomSensitivity_ratio->value);
+		//ADS
+		*cg_zoomSensitivity = (stockCgZoomSensitivity() * cg_zoomSensitivity_ratio->value);
 	}
 	else if (*ads_anim_progress != 0) //ADS animation in progress
 	{
@@ -175,18 +177,18 @@ void sensitivityRatioAds()
 		if (*ads)
 		{
 			//ADS
-			*cg_zoomSensitivity = ((*fov_visible_percentage / *cg_fov_value) * cg_zoomSensitivity_ratio->value);
+			*cg_zoomSensitivity = (stockCgZoomSensitivity() * cg_zoomSensitivity_ratio->value);
 		}
 		else
 		{
 			//NOT ADS
-			*cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
+			*cg_zoomSensitivity = stockCgZoomSensitivity();
 		}
 	}
 	else if (*ads_anim_progress == 0)
 	{
 		//NOT ADS
-		*cg_zoomSensitivity = (*fov_visible_percentage / *cg_fov_value);
+		*cg_zoomSensitivity = stockCgZoomSensitivity();
 	}
 
 	__asm
