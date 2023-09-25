@@ -20,6 +20,7 @@ cvar_t *cl_font_type;
 cvar_t *cg_drawheadnames;
 cvar_t *cg_xui_scoreboard;
 cvar_t *cg_fov;
+cvar_t *cg_zoomSensitivity_ratio;
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
@@ -268,6 +269,7 @@ void CL_Init(void) {
 	cg_drawheadnames = Cvar_Get("cg_drawheadnames", "0", 0);
 	cg_xui_scoreboard = Cvar_Get("cg_xui_scoreboard", "0", 0);
 	cg_fov = Cvar_Get("cg_fov", "80", CVAR_ARCHIVE);
+	cg_zoomSensitivity_ratio = Cvar_Get("sensitivityRatioAds", "1.0", CVAR_ARCHIVE);
 
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
 	Cvar_Set("shortversion", "1.1x");
