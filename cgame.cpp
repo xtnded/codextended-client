@@ -36,6 +36,13 @@ const char* disliked_vars[] = {
 "cl_avidemo",
 NULL };
 
+#define M_DrawShadowString(x,y,font,fontscale,color,text,a,b,c) \
+	RE_SetColor(vColorBlack); \
+	SCR_DrawString(x + 1,y + 1,font,fontscale,vColorBlack,text,a,b,c); \
+	RE_SetColor(color); \
+	SCR_DrawString(x,y,font,fontscale,color,text,a,b,c); \
+	RE_SetColor(NULL);
+
 DWORD cgame_mp;
 
 class ChatMessage {
@@ -50,20 +57,6 @@ public:
 
 std::vector<ChatMessage> chatmessages;
 
-void RGL_DrawChatText(std::string &msg, int x, int y) {
-	glRasterPos2f(x, y);
-	PrintFont(fontIngameChatMessage, msg.c_str());
-}
-
-void CG_RenderChatMessages() {
-	cvar_t *x = Cvar_Get("cg_xui_chat_x", "20", CVAR_ARCHIVE);
-	cvar_t *y = Cvar_Get("cg_xui_chat_y", "60", CVAR_ARCHIVE);
-	int n = 0;
-	for (auto &i : chatmessages) {
-		RGL_DrawChatText(i.msg, x->integer, y->integer + 14 * n);
-		++n;
-	}
-}
 
 void CG_RemoveChatEscapeChar(char *s) {
 	char *src, *dest;
@@ -90,29 +83,7 @@ void myCG_ServerCommand(void) {
 	if (argc > 0) {
 		char* cmd = Cmd_Argv(0);
 		if (strlen(cmd) > 0) {
-			cvar_t *xui_alt_chat = Cvar_Get("cg_xui_chat", "0", CVAR_ARCHIVE);
 			if ((*cmd == 'h' || *cmd == 'i')) {
-				if (xui_alt_chat->integer) {
-					if (*cmd == 'i' || (*cmd == 'h' && !*(int*)CGAME_OFF(0x3029824C))) {
-						ChatMessage cmsg;
-						if (!strlen(Cmd_Argv(1)))
-							return;
-						char msg[150] = { 0 };
-						Q_strncpyz(msg, Cmd_Argv(1), sizeof(msg));
-
-						CG_RemoveChatEscapeChar(msg);
-
-						cmsg.msg = msg;
-						if (chatmessages.size() > 8) {
-							chatmessages.clear();
-						}
-						chatmessages.push_back(cmsg);
-
-						return;
-					}
-				}
-				if (xui_alt_chat->modified)
-					chatmessages.clear();
 			} else if (*cmd == 'b') {
 				Com_DPrintf("[CG_ParseScores] b ");
 				for (size_t i = 0; i < argc; i++) {
@@ -152,50 +123,6 @@ void pm_aimflag() {
 	void(*call)();
 	*(int*)&call = CGAME_OFF(0x3000FB80);
 	call();
-}
-
-extern cvar_t* cg_zoomSensitivity_ratio;
-float stockCgZoomSensitivity()
-{
-	float* fov_visible_percentage = (float*)CGAME_OFF(0x3020958c);	//Visible percentage of cg_fov value
-	float* cg_fov_value = (float*)CGAME_OFF(0x30298c68);
-	return (*fov_visible_percentage / *cg_fov_value);				//See instruction 30032fe8
-}
-void sensitivityRatioAds()
-{
-	float* cg_zoomSensitivity = (float*)CGAME_OFF(0x3020b5f4);		//zoomSensitivity var of cg_t struct
-	float* ads_anim_progress = (float*)CGAME_OFF(0x30207214);		//From 0 to 1
-	//See FUN_30032e20
-	if (*ads_anim_progress == 1) //ADS animation completed
-	{
-		//ADS
-		*cg_zoomSensitivity = (stockCgZoomSensitivity() * cg_zoomSensitivity_ratio->value);
-	}
-	else if (*ads_anim_progress != 0) //ADS animation in progress
-	{
-		bool* ads = (bool*)CGAME_OFF(0x30209458);
-		if (*ads)
-		{
-			//ADS
-			*cg_zoomSensitivity = (stockCgZoomSensitivity() * cg_zoomSensitivity_ratio->value);
-		}
-		else
-		{
-			//NOT ADS
-			*cg_zoomSensitivity = stockCgZoomSensitivity();
-		}
-	}
-	else if (*ads_anim_progress == 0)
-	{
-		//NOT ADS
-		*cg_zoomSensitivity = stockCgZoomSensitivity();
-	}
-
-	__asm
-	{
-		fstp st(0)
-		retn
-	}
 }
 
 #define cg_crosshairClientNum (*(int*)CGAME_OFF(0x3020C8C8))
@@ -401,10 +328,6 @@ typedef struct {
 
 #include <algorithm>
 
-int scoreboardScrollAmount = 0;
-
-bool showScoreboard = false;
-
 void CG_KeyEvent(int key, int down, unsigned time) {
 	if (keys[key].repeats > 1)
 		return;
@@ -413,312 +336,14 @@ void CG_KeyEvent(int key, int down, unsigned time) {
 
 	if (!cgame_mp)
 		return;
-
-	if (!showScoreboard)
-		return;
-
-	if (key == K_MWHEELDOWN) {
-		scoreboardScrollAmount+=5;
-	} else if (key == K_MWHEELUP) {
-		if (scoreboardScrollAmount - 5 >= 0)
-		scoreboardScrollAmount-=5;
-	}
 }
-
-
-int CG_DrawScoreboard() {
-	int *showScores = (int*)CGAME_OFF(0x3020C030);
-
-	if (!*showScores) {
-		showScoreboard = false;
-		__asm xor eax, eax
-		return 0;
-	}
-	showScoreboard = true;
-#define BASE_Y 80
-#define BANNER_SIZE 40
-#define BANNER_WIDTH 372
-
-#define BAR_OPACITY .2
-#define BAR_HEIGHT 15
-#define BAR_WIDTH 320 + 45
-#define BAR_PAD 5
-
-	int base_x = 160 - 50;
-	int base_end_x = BAR_WIDTH + base_x;
-	int base_y = BASE_Y - scoreboardScrollAmount;
-
-	vec4_t teamcolor_allies = { 1, 1, 1, BAR_OPACITY };
-	vec4_t teamcolor_axis = { 1, 1, 1, BAR_OPACITY };
-	vec4_t teamcolor_none = { .5, .5, .5, BAR_OPACITY };
-
-	ParseVector(Cvar_VariableString("g_TeamColor_Allies"), teamcolor_allies);
-	ParseVector(Cvar_VariableString("g_TeamColor_Axis"), teamcolor_axis);
-
-	char *teamname_allies = Cvar_VariableString("g_TeamName_Allies"); 
-	char *teamname_axis = Cvar_VariableString("g_TeamName_Axis");
-
-	if (strstr(teamname_allies, "AMERICAN") != NULL)
-		Cvar_Set("g_TeamName_Allies", "American");
-	else if (strstr(teamname_allies, "RUSSIAN") != NULL)
-		Cvar_Set("g_TeamName_Allies", "Russian");
-	else if (strstr(teamname_allies, "BRITISH") != NULL)
-		Cvar_Set("g_TeamName_Allies", "British");
-
-	if (strstr(teamname_axis, "GERMAN") != NULL)
-		Cvar_Set("g_TeamName_Axis", "German");
-
-	if (!*teamname_allies)
-		teamname_allies = "Allies";
-	if (!*teamname_axis)
-		teamname_axis = "Axis";
-
-	int num_allies = *(int*)CGAME_OFF(0x3020BA24);
-	int num_axis = *(int*)CGAME_OFF(0x3020BA28);
-
-	int num_players = *(int*)CGAME_OFF(0x3020B9FC);
-	int num_spectators = *(int*)CGAME_OFF(0x3020BA2C);
-
-	clientScoreInfo_t *clientscoreinfo = (clientScoreInfo_t*)CGAME_OFF(0x3020BA30);
-	clientInfo_t *ci;
-
-	std::vector<clientScoreInfo_t> sortedscores;
-
-	if (num_players < 0 || num_players >= 64)
-		goto _end;
-
-	#define GetClientInfo(i) \
-		((clientInfo_t*)(CLIENTINFO_SIZE * i + CGAME_OFF(0x3018BC0C)))
-
-	for (int i = 0; i < num_players; i++)
-		sortedscores.push_back(clientscoreinfo[i]);
-
-	struct pred {
-		bool operator()(clientScoreInfo_t const & a, clientScoreInfo_t const & b) const {
-			return a.score > b.score;
-		}
-	};
-
-	std::sort(sortedscores.begin(), sortedscores.end(), pred());
-#define COLUMN_WIDTH 40
-#define M_DrawShadowString(x,y,font,fontscale,color,text,a,b,c) \
-	RE_SetColor(vColorBlack); \
-	SCR_DrawString(x + 1,y + 1,font,fontscale,vColorBlack,text,a,b,c); \
-	RE_SetColor(color); \
-	SCR_DrawString(x,y,font,fontscale,color,text,a,b,c); \
-	RE_SetColor(NULL);
-
-	if (num_players - num_spectators > 0) {
-		if ((!num_allies || !num_axis)) { //draw deathmatch :>
-			RE_SetColor(vColorWhite);
-			if (base_y >= BASE_Y) {
-				int g_ScoresBanner_None = RE_RegisterShaderNoMip(Cvar_VariableString("g_ScoresBanner_None"));
-
-				SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, g_ScoresBanner_None);
-				M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("Players ( %d )", num_players - num_spectators), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_kills"), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_deaths"), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .3, vColorWhite, Cvar_VariableString("g_scoreboard_ping"), NULL, NULL, NULL);
-
-				base_y += 5;
-			}
-			for (int i = 0; i < sortedscores.size(); i++) {
-				clientScoreInfo_t *csi = &sortedscores[i];
-				if (csi->clientNum < 0 || csi->clientNum >= 64)
-					continue;
-				ci = GetClientInfo(csi->clientNum);
-				if (ci->name == nullptr)
-					continue;
-				if (ci->team == TEAM_SPECTATOR)
-					continue;
-				if ((base_y + BAR_HEIGHT + BAR_PAD) < BASE_Y) {
-					base_y += BAR_HEIGHT + BAR_PAD;
-					continue;
-				}
-				RE_SetColor(teamcolor_none);
-				SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
-				RE_SetColor(vColorWhite);
-				if (csi->statusicon)
-				SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-				M_DrawShadowString(base_x + BAR_HEIGHT , base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
-				M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 15, 1, .3, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
-				base_y += BAR_HEIGHT + BAR_PAD;
-			}
-			RE_SetColor(NULL);
-		} else {
-			int allies_score = 0, axis_score = 0;
-
-			for (int i = 0; i < num_players; i++) {
-				clientScoreInfo_t *csi = &clientscoreinfo[i];
-				ci = GetClientInfo(csi->clientNum);
-
-				if (ci->team == TEAM_ALLIES)
-					allies_score += csi->score;
-				else if (ci->team = TEAM_AXIS)
-					axis_score += csi->score;
-			}
-			char *teamname1, *teamname2;
-			int teamcount1, teamcount2;
-			float *teamcolor1, *teamcolor2;
-			char *teambanner_n1, *teambanner_n2;
-			int team1, team2;
-			if (allies_score >= axis_score) {
-				team1 = TEAM_ALLIES;
-				team2 = TEAM_AXIS;
-				teamname1 = teamname_allies;
-				teamname2 = teamname_axis;
-				teamcount1 = num_allies;
-				teamcount2 = num_axis;
-				teambanner_n1 = Cvar_VariableString("g_ScoresBanner_Allies");
-				teambanner_n2 = Cvar_VariableString("g_ScoresBanner_Axis");
-				teamcolor1 = teamcolor_allies;
-				teamcolor2 = teamcolor_axis;
-			} else {
-				team1 = TEAM_AXIS;
-				team2 = TEAM_ALLIES;
-				teamname2 = teamname_allies;
-				teamname1 = teamname_axis;
-				teamcount2 = num_allies;
-				teamcount1 = num_axis;
-				teambanner_n2 = Cvar_VariableString("g_ScoresBanner_Allies");
-				teambanner_n1 = Cvar_VariableString("g_ScoresBanner_Axis");
-				teamcolor2 = teamcolor_allies;
-				teamcolor1 = teamcolor_axis;
-			}
-
-				RE_SetColor(vColorWhite);
-				if (base_y >= BASE_Y) {
-					int banner1 = RE_RegisterShaderNoMip(teambanner_n1);
-
-					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, banner1);
-					M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("%s ( %d )", teamname1, teamcount1), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_kills"), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_deaths"), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 15, base_y, 1, .15, vColorWhite, Cvar_VariableString("g_scoreboard_ping"), NULL, NULL, NULL);
-
-					base_y += 5;
-				}
-				for (int i = 0; i < sortedscores.size(); i++) {
-					clientScoreInfo_t *csi = &sortedscores[i];
-					if (csi->clientNum < 0 || csi->clientNum >= 64)
-						continue;
-					ci = GetClientInfo(csi->clientNum);
-					if (ci->name == nullptr)
-						continue;
-					if (ci->team != team1)
-						continue;
-					if ((base_y + BAR_HEIGHT + BAR_PAD) < BASE_Y) {
-						base_y += BAR_HEIGHT + BAR_PAD;
-						continue;
-					}
-					RE_SetColor(teamcolor1);
-					SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
-					RE_SetColor(vColorWhite);
-					if (csi->statusicon)
-					SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-					M_DrawShadowString(base_x + BAR_HEIGHT , base_y + 10, 1, .15, vColorWhite, ci->name, NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
-					base_y += BAR_HEIGHT + BAR_PAD;
-				}
-				RE_SetColor(NULL);
-
-				base_y += 50;
-				RE_SetColor(vColorWhite);
-				if (base_y >= BASE_Y) {
-					int banner2 = RE_RegisterShaderNoMip(teambanner_n2);
-
-					SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, banner2);
-					M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("%s ( %d )", teamname2, teamcount2), NULL, NULL, NULL);
-					
-					base_y += 5;
-				}
-				for (int i = 0; i < sortedscores.size(); i++) {
-					clientScoreInfo_t *csi = &sortedscores[i];
-					if (csi->clientNum < 0 || csi->clientNum >= 64)
-						continue;
-					ci = GetClientInfo(csi->clientNum);
-					if (ci->name == nullptr)
-						continue;
-					if (ci->team != team2)
-						continue;
-					if ((base_y + BAR_HEIGHT + BAR_PAD) < BASE_Y) {
-						base_y += BAR_HEIGHT + BAR_PAD;
-						continue;
-					}
-					RE_SetColor(teamcolor2);
-					SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
-					RE_SetColor(vColorWhite);
-					if (csi->statusicon)
-					SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-					M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 10, 1, .15, vColorWhite, ci->name, NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 3 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->score), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH * 2 + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->deaths), NULL, NULL, NULL);
-					M_DrawShadowString(base_end_x - COLUMN_WIDTH + 12, base_y + 10, 1, .15, vColorWhite, va("%d", csi->ping), NULL, NULL, NULL);
-					base_y += BAR_HEIGHT + BAR_PAD;
-				}
-				RE_SetColor(NULL);
-		}
-	}
-
-	vec4_t color_spectator_bar_bg = { 1, 1, 1, BAR_OPACITY };
-
-	if (num_spectators > 0) {
-		base_y += 50;
-		RE_SetColor(vColorWhite);
-
-		int g_ScoresBanner_Spectators = RE_RegisterShaderNoMip(Cvar_VariableString("g_ScoresBanner_Spectators"));
-		if (base_y >= BASE_Y){
-			SCR_DrawPic(base_x, base_y - BANNER_SIZE, BANNER_WIDTH, BANNER_SIZE, g_ScoresBanner_Spectators);
-			M_DrawShadowString(base_x + BANNER_SIZE, base_y, 1, .3, vColorWhite, va("Spectators ( %d )", num_spectators), NULL, NULL, NULL);
-		}
-		for (int i = 0; i < sortedscores.size(); i++) {
-			clientScoreInfo_t *csi = &sortedscores[i];
-			if (csi->clientNum < 0 || csi->clientNum >= 64)
-				continue;
-			ci = GetClientInfo(csi->clientNum);
-			if (ci->name == nullptr)
-				continue;
-			if (ci->team != TEAM_SPECTATOR && ci->team != TEAM_FREE)
-				continue;
-			if ((base_y + BAR_HEIGHT + BAR_PAD) < BASE_Y) {
-				base_y += BAR_HEIGHT + BAR_PAD;
-				continue;
-			}
-			RE_SetColor(color_spectator_bar_bg);
-			SCR_DrawPic(base_x, base_y, BAR_WIDTH, BAR_HEIGHT, RE_RegisterShader("white"));
-			RE_SetColor(vColorWhite);
-			if (csi->statusicon)
-			SCR_DrawPic(base_x, base_y, BAR_HEIGHT, BAR_HEIGHT, csi->statusicon);
-			M_DrawShadowString(base_x + BAR_HEIGHT * 2, base_y + 15, 1, .3, vColorWhite, ci->name, NULL, NULL, NULL);
-			base_y += BAR_HEIGHT + BAR_PAD;
-		}
-		RE_SetColor(NULL);
-	}
-	_end:
-	__asm mov eax, 1
-	return 1;
-}
-
-cJMP cj_scoreboard;
 
 extern cvar_t *cg_drawheadnames;
-extern cvar_t *cg_xui_scoreboard;
 
 void CG_SCR_DrawScreenField(int stereoFrame) {
 	if (cg_drawheadnames->modified) {
 		void CG_SetHeadNames(int flag);
 		CG_SetHeadNames(cg_drawheadnames->integer);
-	}
-
-	if (cg_xui_scoreboard->modified && *cls_state == 6) {
-		if (cg_xui_scoreboard->integer)
-			cj_scoreboard.Apply();
-		else
-			cj_scoreboard.Restore();
 	}
 }
 
@@ -771,86 +396,129 @@ void CG_DrawFPS(float y) {
 	}
 }
 
-typedef enum {
-	TR_STATIONARY,
-	TR_INTERPOLATE,             // non-parametric, but interpolate between snapshots
-	TR_LINEAR,
-	TR_LINEAR_STOP,
-	TR_LINEAR_STOP_BACK,        //----(SA)	added.  so reverse movement can be different than forward
-	TR_SINE,                    // value = base + sin( time / duration ) * delta
-	TR_GRAVITY,
-	// Ridah
-	TR_GRAVITY_LOW,
-	TR_GRAVITY_FLOAT,           // super low grav with no gravity acceleration (floating feathers/fabric/leaves/...)
-	TR_GRAVITY_PAUSED,          //----(SA)	has stopped, but will still do a short trace to see if it should be switched back to TR_GRAVITY
-	TR_ACCELERATE,
-	TR_DECCELERATE,
-	// Gordon
-	TR_SPLINE,
-	TR_LINEAR_PATH
-} trType_t;
-
-typedef struct {
-	trType_t trType;
-	int trTime;
-	int trDuration;             // if non 0, trTime + trDuration = stop time
-//----(SA)	removed
-	vec3_t trBase;
-	vec3_t trDelta;             // velocity, etc
-//----(SA)	removed
-} trajectory_t;
-
-typedef struct entityState_s {
-	int number;
-	entityTypes eType; //4
-	int eFlags; //8
-	trajectory_t pos; //12
-	trajectory_t apos; //48
-	int unk; //84 //time??
-	int unk2; //88 //time2??
-	vec3_t origin2; //92
-	vec3_t angles2; //104 (guessed name)
-	int otherEntityNum; //116
-	int otherEntityNum2; //120
-	int groundEntityNum; //124
-	int constantLight; //128
-	int loopSound; //132
-	int surfaceFlags; //136
-	int modelindex; //140
-	int clientNum; //144
-	char ___cba[0x34];
-	/*
-	gentity_t *teammaster; //152
-	int eventParm; //160
-	int eventSequence; //164
-	int events[4]; //168
-	int eventParms[4]; //184
-	*/
-
-	int weapon; //200
-	int legsAnim; //204
-	int torsoAnim; //208
-	float leanf; //212
-	int loopfxid; //216
-	int hintstring; //220
-	int animMovetype; //224
-} entityState_t;
-
-void CG_Obituary(entityState_t* ent) {
+void CG_Obituary(int ent) {
 	if (!Cvar_VariableIntegerValue("cg_x_obituary")) return;
 
-	void(*call)(entityState_t*);
+	void(*call)(int);
 	*(int*)(&call) = CGAME_OFF(0x3001D6C0);
 	call(ent);
+}
+
+void PM_ClipVelocity(vec3_t in, vec3_t normal, vec3_t out) {
+	float	backoff;
+	float	change;
+	int		i;
+	float   overbounce = 1.001f;
+
+	backoff = DotProduct(in, normal);
+
+	if (backoff < 0) {
+		backoff *= overbounce;
+	}
+	else {
+		backoff /= overbounce;
+	}
+
+	for (i = 0; i < 3; i++) {
+		change = normal[i] * backoff;
+		out[i] = in[i] - change;
+	}
+}
+
+// xoxor4d
+void PM_ProjectVelocity(vec3_t in, vec3_t normal, vec3_t out) {
+	float speedXY, DotNormalXY, normalisedNormalXY, projectionZ, projectionXYZ;
+
+	speedXY = in[1] * in[1] + in[0] * in[0];
+
+	if ((normal[2]) < 0.001f || (speedXY == 0.0f)) {
+		VectorCopy(in, out);
+	}
+	else {
+		DotNormalXY = normal[1] * in[1] + in[0] * normal[0];
+		normalisedNormalXY = -DotNormalXY / normal[2];
+
+		projectionZ = in[2] * in[2] + speedXY;
+
+		projectionXYZ = sqrtf((projectionZ / (speedXY + normalisedNormalXY * normalisedNormalXY)));
+
+		if (projectionXYZ < 1.0f || normalisedNormalXY < 0.0f || in[2] > 0.0f) {
+			out[0] = projectionXYZ * in[0];
+			out[1] = projectionXYZ * in[1];
+			out[2] = projectionXYZ * normalisedNormalXY;
+		}
+	}
+}
+
+uint32_t PM_Bounce(vec3_t in, vec3_t normal, vec3_t out) {
+	int x_cl_bounce = atoi(Info_ValueForKey(cs1, "x_cl_bounce"));
+
+	if (x_cl_bounce) {
+		PM_ProjectVelocity(in, normal, out);
+	}
+	else {
+		PM_ClipVelocity(in, normal, out);
+	}
+
+	return CGAME_OFF(0x3000D830);
+}
+
+__declspec(naked) void PM_Bounce_Stub()
+{
+	__asm
+	{
+		push    esi; // out
+		push    ecx; // normal
+		push    edx; // in
+		call    PM_Bounce;
+		add     esp, 12;
+
+		push eax
+			retn;
+	}
+}
+
+static void (*PM_CheckForChangeWeapon)();
+static void (*PM_BeginWeaponChange)(int, int);
+static void (*PM_FinishWeaponChange)();
+void _PM_CheckForChangeWeapon()
+{
+	int* pm = (int*)(cgame_mp + 0x19D570);
+	pmove_t* xm = *(pmove_t**)(int)pm;
+
+	if ((xm->ps->pm_flags & 0x20000))
+	{
+		int* weapon = (int*)((int)xm->ps + 176);
+		if (*weapon)
+		{
+			PM_BeginWeaponChange(*weapon, 0);
+		}
+		return;
+	}
+	PM_CheckForChangeWeapon();
+}
+
+void _PM_FinishWeaponChange()
+{
+	int* pm = (int*)(cgame_mp + 0x19D570);
+	pmove_t* xm = *(pmove_t**)(int)pm;
+
+	if ((xm->ps->pm_flags & 0x20000))
+	{
+		int* weapon = (int*)((int)xm->ps + 176);
+		if (*weapon)
+		{
+			*weapon = 0;
+		}
+		return;
+	}
+	PM_FinishWeaponChange();
 }
 
 void CG_Init(DWORD base) {
 	cgame_mp = base;
 	CG_ServerCommand = (CG_ServerCommand_t)(cgame_mp + 0x2E0D0);
 	CG_Argv = (char*(*)(int))CGAME_OFF(0x30020960);
-
-	//__jmp(CGAME_OFF(0x3002B650), (int)CG_DrawScoreboard);
-	cj_scoreboard.Initialize(CGAME_OFF(0x3002B650), (UINT32)CG_DrawScoreboard, true);
 
 	XUNLOCK((void*)CGAME_OFF(0x3020C8C8), sizeof(int));
 
@@ -872,11 +540,19 @@ void CG_Init(DWORD base) {
 
 	__call(CGAME_OFF(0x3001E6A1), (int)CG_Obituary);
 
-	__jmp(CGAME_OFF(0x30032fe8), (int)sensitivityRatioAds);
-
-	*(UINT32*)CGAME_OFF(0x300749EC) = 1; // Enable cg_fov
-	// *(UINT32*)CGAME_OFF(0x30074EBC) = 0; // Enable cg_thirdperson
+	*(UINT32*)CGAME_OFF(0x300749EC) = CVAR_ARCHIVE; // Enable cg_fov
+	*(UINT32*)CGAME_OFF(0x30074EBC) = CVAR_ARCHIVE; // Enable cg_thirdperson
 
 	void CG_SetHeadNames(int flag);
 	CG_SetHeadNames(cg_drawheadnames->integer);
+
+	__jmp(CGAME_OFF(0x3000D82B), (int)PM_Bounce_Stub);
+
+	__nop(CGAME_OFF(0x30065550), 1); //weapon 32 fix
+
+	__call(CGAME_OFF(0x30011C25), (int)_PM_CheckForChangeWeapon);
+	__call(CGAME_OFF(0x30011CB4), (int)_PM_FinishWeaponChange);
+	PM_CheckForChangeWeapon = (void(*)())CGAME_OFF(0x300112E0);
+	PM_BeginWeaponChange = (void(*)(int, int))CGAME_OFF(0x30010570);
+	PM_FinishWeaponChange = (void(*)())CGAME_OFF(0x300107c0);
 }

@@ -5,6 +5,8 @@
 #include "Shellapi.h"
 #include "resource.h"
 
+#include <tchar.h>
+
 static int(__stdcall *main)(HINSTANCE, HINSTANCE, LPSTR, int) = (int(__stdcall*)(HINSTANCE, HINSTANCE, LPSTR, int))0x4640B0;
 
 char sys_cmdline[MAX_STRING_CHARS];
@@ -212,16 +214,52 @@ void Sys_Unload() {
 	void CleanupThreads();
 	CleanupThreads();
 
-	void XUI_Destroy();
-	XUI_Destroy();
-
 	void CL_DiscordShutdown();
 	CL_DiscordShutdown();
+}
+
+void RegistryAddURLProtocol() {
+	HKEY hkey;
+	char gamePath[MAX_PATH], szExe[MAX_PATH * 2];
+	GetModuleFileName(NULL, gamePath, MAX_PATH);
+	LPCTSTR defaultIcon = TEXT("CoDMP.exe,0");
+
+	if (RegCreateKeyA(HKEY_CURRENT_USER, "Software\\Classes\\cod1x", &hkey) == ERROR_SUCCESS) {
+		RegSetValueExA(hkey, "URL Protocol", 0, REG_SZ, (PBYTE)"", 1);
+		RegSetValueExA(hkey, "DefaultIcon", 0, REG_SZ, (LPBYTE)defaultIcon, _tcslen(defaultIcon) * sizeof(TCHAR));
+		RegCloseKey(hkey);
+	}
+
+	if (RegCreateKeyA(HKEY_CURRENT_USER, "Software\\Classes\\cod1x\\shell\\open\\command", &hkey) == ERROR_SUCCESS) {
+		Com_sprintf(szExe, sizeof(szExe), "%s %%1", gamePath);
+		RegSetValueA(hkey, NULL, REG_SZ, szExe, strlen(szExe));
+		RegCloseKey(hkey);
+	}
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	hInst = hInstance;
 	strncpy(sys_cmdline, lpCmdLine, sizeof(sys_cmdline) - 1);
+
+	// Custom URL protocol: cod1x://1.2.3.4 to connect to a server.
+	std::string strCmdLine = std::string(lpCmdLine);
+	if (strCmdLine.rfind("cod1x://", 0) == 0) {
+		// Remove cod1x:// and ending slash from string.
+		strCmdLine.erase(0, 8);
+		if (strCmdLine.back() == '/')
+			strCmdLine.pop_back();
+
+		// Check is IP valid.
+		netadr_t ip;
+		if (NET_StringToAdr(strCmdLine.c_str(), &ip)) {
+			// Set "connect ip" command to the command line.
+			strCmdLine = "connect " + strCmdLine;
+			lpCmdLine = const_cast<char*>(strCmdLine.c_str());
+		}
+	}
+	else { // Add the registry keys for the protocol.
+		RegistryAddURLProtocol();
+}
 
 #ifdef PROJECT_EXE
 	threadInfo_t *thr = AddThread("loadingbar", thr_LoadingBar);
@@ -255,12 +293,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	extern bool miles32_loaded;
 	if (!miles32_loaded)
 		return 0;
-
-	void XUI_Init();
-	XUI_Init();
-
-	void CL_DiscordInitialize();
-	CL_DiscordInitialize();
 
 	return main(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
 #endif

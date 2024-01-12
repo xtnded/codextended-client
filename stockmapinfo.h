@@ -15,6 +15,3 @@ static const char *szStockMaps[] = {
 	"mp_brecourt",
 	nullptr
 };
-
-#define STOCK_MAP_COUNT 12
-extern int stockMapLoadScreenShaders[STOCK_MAP_COUNT];

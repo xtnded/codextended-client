@@ -183,25 +183,13 @@ void Menu_PaintAll() {
 	}
 
 	RE_SetColor(vColorWhite);
-	if (xui != nullptr) {
-		for (auto& i : xui->menus) {
-			if (!i->IsOpen())
-				continue;
-			/* special menu cases */
-			if (!Menu_IsMainOpen() && i->bMainHook)
-				continue;
-			if (i->eName == 1 && i->IsMouseOver())
-				i->SetFocused(true);
-			/* end */
-			i->Render(true);
-		}
-	}
-	RE_SetColor(vColorWhite);
 }
 
 image_t *cursorImage = nullptr;
 
 void _UI_Init(int inGameLoad) {
+	Cvar_Set("ui_netSource", "1"); // Set default netSource to Internet before the cached servers load.
+
 	void(*o)(int);
 	*(int*)&o = UI_FILE_OFF(0x4000D310);
 
@@ -224,15 +212,8 @@ void _UI_Init(int inGameLoad) {
 static bool isUIRunning = false;
 
 void CL_ShutdownUI_Cleanup() {
-	if (isUIRunning) {
-		void XR_CleanupTextures();
-		XR_CleanupTextures();
-
-		void DestroyRender();
-		DestroyRender();
 
 		isUIRunning = false;
-	}
 }
 
 UINT32 pInterceptCallToShutdownUI;
@@ -301,9 +282,6 @@ void UI_DrawConnectScreen(int overlay) {
 	SCR_DrawPic(0, 0, 640, 480, blackShader);
 	RE_SetColor(NULL);
 
-	void PrintFont(unsigned int fontID, const char *fmt, ...);
-	unsigned int fontMainMenuHeader;
-
 	static int connect_dots = 0;
 	static int connect_dots_time = *cls_realtime;
 	char szdots[50] = { 0 };
@@ -329,6 +307,7 @@ void UI_DrawConnectScreen(int overlay) {
 		case CA_CONNECTED:
 			char *downloadName = Cvar_VariableString("cl_downloadName");
 			if (*downloadName) {
+				//downloadname,centerPoint,ystart,scale
 				void(*UI_DisplayDownloadInfo)(char*, float, float, float) = (void(*)(char*, float, float, float))UI_FILE_OFF(0x4000DEA0);
 				UI_DisplayDownloadInfo(downloadName, 320, 55, 0.25);
 				return;
@@ -357,8 +336,8 @@ void UI_StartServerRefresh(qboolean full) {
 	o(full);
 }
 
-void UI_DisplayDownloadInfo(const char downloadName, float centerPoint, float yStart, float scale) {
-	void(*DisplayText)(const char, float, float, float);
+void UI_DisplayDownloadInfo(const char* downloadName, float centerPoint, float yStart, float scale) {
+	void(*DisplayText)(const char*, float, float, float);
 	*(int*)&DisplayText = UI_FILE_OFF(0x4000DEA0);
 	DisplayText(downloadName, centerPoint, yStart, 0.25);
 }
@@ -376,21 +355,10 @@ void UI_Init(DWORD base) {
 	Menus_CloseAll = (void(*)())UI_FILE_OFF(0x40010660);
 	*(int*)&Menus_FindByName = UI_FILE_OFF(0x40010560);
 	ui_cursor = (cursorPositionInfo_t*)UI_FILE_OFF(0x401C3DD4);
-	
-	__call(UI_FILE_OFF(0x40007BA5), (int)Menu_PaintAll);
-	__jmp(UI_FILE_OFF(0x4000A5F0), (int)UI_RunMenuScript);
-	__call(UI_FILE_OFF(0x400076BE), (int)_UI_Init);
 
 	__call(UI_FILE_OFF(0x4000AA55), (int)UI_StartServerRefresh);
 
-	cvar_t* xui_connect = Cvar_Get("cg_xui_connect", "0", CVAR_ARCHIVE);
-	if (xui_connect->integer) {
-		__call(UI_FILE_OFF(0x4000774E), (int)UI_DrawConnectScreen);
-	}
-
 	__call(UI_FILE_OFF(0x4000E895), (int)UI_DisplayDownloadInfo); // Smaller download text (UDP only).
-
-	*(BYTE*)UI_FILE_OFF(0x40007BD1) = 0xeb; // jle > jmp for drawing cursor
 
 	pInterceptCallToShutdownUI = UI_FILE_OFF(0x40007C20);
 	__call(UI_FILE_OFF(0x400076C8), (int)InterceptCallToShutdownUI);
@@ -398,12 +366,15 @@ void UI_Init(DWORD base) {
 	char *szPath;
 	for (int i = 0; szStockMaps[i] != NULL; i++) {
 		szPath = va("levelshots/%s.dds", szStockMaps[i]);
-		stockMapLoadScreenShaders[i] = RE_RegisterShaderNoMip(szPath);
 	}
-
-	void XR_LoadTextures();
-	XR_LoadTextures();
 
 	void InitRender();
 	InitRender();
+
+	#define PATCH_PUSH_STRING_PTR_VALUE(offset, new_str) \
+	XUNLOCK((void*)offset, 10); \
+	*(const char **)(offset + 1) = new_str;
+
+	PATCH_PUSH_STRING_PTR_VALUE(UI_FILE_OFF(0x4000B86B), "1.1x");
+	PATCH_PUSH_STRING_PTR_VALUE(UI_FILE_OFF(0X4000E575), "1.1x");
 }

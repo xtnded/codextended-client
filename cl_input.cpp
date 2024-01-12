@@ -3,51 +3,19 @@
 #include "client.h"
 #include "exmaster_client.h"
 
-qkey_t *keys = (qkey_t*)0x142F780;
+qkey_t* keys = (qkey_t*)0x142F780;
 
-static cvar_t *cl_bypassMouseInput = (cvar_t*)0x142F604;
+static cvar_t* cl_bypassMouseInput = (cvar_t*)0x142F604;
 
 #define KEY_ENTER 13 //KEY_RETURN?
 #define KEY_BACKSPACE 8
 
 void CL_CharEvent_(int key) {
-	if (key == (unsigned char) '`' || key == (unsigned char) '~') {
+	if (key == (unsigned char)'`' || key == (unsigned char)'~') {
 		return;
 	}
 	if (*cls_keyCatchers & KEYCATCH_CONSOLE) // some day use the field_t types :D:D:DD but for now custom (c) php
 		return;
-
-	if(UIObject::prevFocus != nullptr) {
-		UIObject *o = UIObject::prevFocus;
-		if (o->focused && o->IsOpen()) {
-			if (o->classType == UIOT_TEXTBOX) {
-				if (key == KEY_ENTER) {
-					UITextbox *t = dynamic_cast<UITextbox*>(o);
-					if (t != nullptr)
-						t->OnEnter();
-				} else if (key == 8) {
-					if (o->text.size())
-						o->text.pop_back();
-				}
-				else {
-					bool found = false;
-
-					for (int c = ' '; c < '~'; c++) {
-						if (c == key) {
-							found = true;
-							break;
-						}
-					}
-
-					if (found) {
-						int len = (SMALLCHAR_WIDTH * (o->fontScale / SMALLCHAR_SCALE)) * o->text.size() + 1;
-						if (len <= o->width)
-							o->text.push_back(key);
-					}
-				}
-			}
-		}
-	}
 }
 
 #define CALL_CL_KEYEVENT(key) \
@@ -92,7 +60,7 @@ void CL_KeyEvent(int key, int down, unsigned int time) {
 	if (*cls_keyCatchers & KEYCATCH_CONSOLE) {
 
 		if (key == 'a' && keys[K_LCTRL].down) {
-			char *consoleBuffer = (char*)0x142F65C;
+			char* consoleBuffer = (char*)0x142F65C;
 			if (CopyToClipboard(consoleBuffer));
 		}
 		return;
@@ -102,3 +70,29 @@ void CL_KeyEvent(int key, int down, unsigned int time) {
 	if (!down || !keys[key].down || keys[key].repeats > 1)
 		return;
 }
+
+UINT_PTR pfield_charevent_return = (UINT_PTR)0x40CB77;
+UINT_PTR pfield_charevent_continue = (UINT_PTR)0x40CB23;
+
+__declspec(naked) void Field_CharEvent_IgnoreTilde()
+{
+	__asm
+	{
+		cmp ebx, 20h
+		jge check
+		jmp pfield_charevent_return
+
+		check :
+		cmp ebx, 126
+			jl checked
+			jmp pfield_charevent_return
+
+			checked :
+		jmp pfield_charevent_continue
+	}
+}
+
+// cmp ebx, 20h is 3 bytes, we need 5 for a jmp...
+// jl ... is 2 bytes 7c54 (assuming when subtracing the addresses)
+// so it works out
+// - Richard

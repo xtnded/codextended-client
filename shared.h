@@ -1,4 +1,5 @@
 #include "common.h"
+#include <assert.h>
 
 #define CVAR_ARCHIVE        1   // set to cause it to be saved to vars.rc
 // used for system variables, not for player
@@ -132,7 +133,6 @@ typedef enum {
 #define COLOR_MDCYAN    'B'
 #define COLOR_MDPURPLE  'C'
 #define COLOR_NULL      '*'
-
 
 #define COLOR_BITS  31
 #define ColorIndex( c )   ( ( ( c ) - '0' ) & COLOR_BITS )
@@ -276,7 +276,91 @@ typedef struct {
 	netchan_t	netchan;
 } clientConnection_t;
 
-typedef void(*Cvar_Set_t)(char*, char*);
+typedef struct vidmode_s
+{
+	const char* description;
+	int width, height;
+	float pixelAspect;
+} vidmode_t;
+
+#pragma pack(push, 1)
+typedef struct playerState_s
+{
+	int commandTime;
+	int pm_type;
+	int bobCycle;
+	int pm_flags;
+	int pm_time;
+	vec3_t origin;
+	vec3_t velocity;
+	char gap_2C[20];
+	float leanf;
+	int speed;
+	char gap_48[12];
+	int groundEntityNum;
+	char gap_58[12];
+	int jumpTime;
+	int field_68;
+	int legsTime;
+	int legsAnim;
+	int torsoTime;
+	int torsoAnim;
+	int movementDir;
+	int eFlags;
+	char gap_84[24];
+	int field_9C;
+	int field_A0;
+	int field_A4;
+	int field_A8;
+	int clientNum;
+	int weapon;
+	int field_B4;
+	char gap_B8;
+	char gap_B9;
+	char gap_BA[2];
+	int field_BC;
+	vec3_t viewangles;
+	char gap_CC[40];
+	int health;
+	char gap_F8[556];
+	vec3_t mins;
+	vec3_t maxs;
+	float viewheight_prone;
+	int viewheight_crouched;
+	float viewheight_standing;
+	int field_348;
+	float runSpeedScale;
+	float sprintSpeedScale;
+	char gap_354[40];
+	float friction;
+	char gap_380[68];
+	float fTorsoHeight;
+	float fTorsoPitch;
+	float fWaistPitch;
+	char rest[7416];
+	int end;
+} playerState_t;
+#pragma pack(pop)
+
+typedef struct usercmd_s {
+	int serverTime;
+	byte buttons; //console,chat talking, aim down the sight, attackbutton, usebutton
+	byte wbuttons; //lean right,left,reload
+	byte weapon;
+	byte flags;
+	int angles[3];
+
+	signed char forwardmove, rightmove, upmove;
+	byte unknown; //could be doubleTap or client
+} usercmd_t;
+
+typedef struct { //usercmd_s i defined in server.h mmmmmmm
+	playerState_t* ps;
+	usercmd_t cmd;
+	//other stuff
+} pmove_t;
+
+typedef void(*Cvar_Set_t)(const char*, const char*);
 typedef cvar_t* (*Cvar_Get_t)(const char*, const char*, int);
 typedef cvar_t* (*Cvar_FindVar_t)(const char*);
 
@@ -305,9 +389,7 @@ extern DWORD cgame_mp;
 #define GAME_OFF(x) (game_mp + (x - 0x20000000))
 #define CGAME_OFF(x) (cgame_mp + (x - 0x30000000))
 
-
 /* net stuff */
-
 
 #define EX_MASTER_NAME "xtnded.org"
 extern netadr_t ex_master;
@@ -348,10 +430,11 @@ typedef void(*MSG_initHuffman_t)(void);
 extern MSG_initHuffman_t MSG_initHuffman;
 
 void MSG_Init(msg_t *buf, byte *data, int length);
-
 char* trimSpaces(char* str);
 char* Q_CleanStr(char* string, bool colors = false);
-
 char* Com_CleanHostname(char* hostname, bool colors);
 char* Com_CleanMapname(char* mapname);
 const char* Com_GametypeName(char* gt, bool colors = false);
+bool GetDesktopResolution(int* pHorizontal, int* pVertical);
+int Q_stricmp(const char* s1, const char* s2);
+int I_stricmp(const char* s0, const char* s1);

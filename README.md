@@ -3,7 +3,6 @@
 CoDExtended Client (1.1x), is a client-side modification for Call of Duty 1 1.1.
 
 ## Requirements
-
 - At least PC with Windows XP SP3 Update, but recommended is Windows 10. (Supported OS'es: Win XP SP3,Win 7,Win 10, Win 11), non tested OS'es: Win Vista, Win 8
 - Disabled VirtualStore
 

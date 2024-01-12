@@ -1,7 +1,7 @@
 #include "shared.h"
 #include "dl_public.h"
 #include "client.h"
-#pragma comment(lib, "libs/libcurl/libcurl.lib")
+#pragma comment(lib, "libs/libcurl/libcurl_a.lib")
 #include "libs/libcurl/curl.h"
 #include <iostream>
 #include "version.h"
@@ -240,6 +240,6 @@ dlStatus_t DL_DownloadLoop() {
 	}
 
 	*localDownloadName = '\0';
-	((void(*)())0x40F640)(); //CL_Reconnect_f
+	//((void(*)())0x40F640)(); //CL_Reconnect_f //don't reconnect after each download
 	return DL_DONE;
 }
