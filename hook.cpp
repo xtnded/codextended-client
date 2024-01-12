@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "shared.h"
 #include "client.h"
+#include "version.h"
 
-//0046319B E8 10 B1 FA FF                                      call    sub_40E2B0
+//0046319B E8 10 B1 FA FF  call    sub_40E2B0
 void sub_40E2B0() {
 	void(*o)();
 	*(UINT32*)&o = 0x40E2B0;
@@ -38,11 +39,24 @@ bool apply_hooks() {
 	if (codversion != COD_1)
 		return true;
 	
-	   #define PATCH_PUSH_STRING_PTR_VALUE(offset, new_str) \
+	#define PATCH_PUSH_STRING_PTR_VALUE(offset, new_str) \
 	XUNLOCK((void*)offset, 10); \
 	*(const char **)(offset + 1) = new_str;
 
+	#define PATCH_PUSH_INT_PTR_VALUE(offset, new_int) \
+	XUNLOCK((void*)offset, 10); \
+	*(int *)(offset + 1) = new_int;
+
 	PATCH_PUSH_STRING_PTR_VALUE(0x50847D, "Call of Duty 1.1x Multiplayer");
+	PATCH_PUSH_STRING_PTR_VALUE(0x437A78, "1.1x " BUILD);
+	PATCH_PUSH_STRING_PTR_VALUE(0x4130BB, "1.1x"); //cl_updateoldversion
+	PATCH_PUSH_STRING_PTR_VALUE(0x4375D3, "1.1x");
+	PATCH_PUSH_STRING_PTR_VALUE(0x437A4F, "1.1x");
+	PATCH_PUSH_STRING_PTR_VALUE(0x437A4F, "1.1x");
+	PATCH_PUSH_STRING_PTR_VALUE(0x437A29, __DATE__);
+	PATCH_PUSH_STRING_PTR_VALUE(0x437A24, __TIME__);
+	PATCH_PUSH_INT_PTR_VALUE(0x437A2E, BUILDNUMBER);
+	PATCH_PUSH_STRING_PTR_VALUE(0x4E9A5E, ""); //Too many visible models more than %i spam fix
 
 	__call(0x46319B, (int)sub_40E2B0); //cleanup exit
 
@@ -82,6 +96,9 @@ bool apply_hooks() {
 	XUNLOCK((void*)0x466414, 4);
 	*(int*)0x466414 = (int)ConsoleWndProc;
 
+	void Field_CharEvent_IgnoreTilde();
+	__jmp(0x40CB1E, (int)Field_CharEvent_IgnoreTilde);
+
 	void CL_CharEvent();
 	__call(0x436643, (int)CL_CharEvent);
 
@@ -112,30 +129,6 @@ bool apply_hooks() {
 	__call(0x4D87F5, (int)RB_ShowImages);
 	__nop(0x4D87F0, 5); //cmp and jz for r_showImages->integer
 
-	/*
-	void __stdcall RB_BeginSurface(); // crashes?
-	__call(0x4D4A2C, (int)RB_BeginSurface);
-	__call(0x4D6886, (int)RB_BeginSurface);
-	__call(0x4D740B, (int)RB_BeginSurface);
-	__call(0x4D7650, (int)RB_BeginSurface);
-	__call(0x4D7852, (int)RB_BeginSurface);
-	__call(0x4D7B20, (int)RB_BeginSurface);
-	__call(0x4D8448, (int)RB_BeginSurface);
-	__call(0x4D9588, (int)RB_BeginSurface);
-	__call(0x4E0492, (int)RB_BeginSurface);
-	__call(0x4E810E, (int)RB_BeginSurface);
-	__call(0x4E847C, (int)RB_BeginSurface);
-	__call(0x4E84FE, (int)RB_BeginSurface);
-	__call(0x4E860B, (int)RB_BeginSurface);
-	__call(0x50F9E2, (int)RB_BeginSurface);
-	__jmp(0x50FA0F , (int)RB_BeginSurface);
-	__call(0x50FA72, (int)RB_BeginSurface);
-	__call(0x50FE75, (int)RB_BeginSurface);
-	__call(0x511067, (int)RB_BeginSurface);
-	__call(0x511D85, (int)RB_BeginSurface);
-	__call(0x51269B, (int)RB_BeginSurface);
-	*/
-
 	void* ri_Hunk_AllocAlign(int size);
 	XUNLOCK((void*)0x4FD6AF, 6);
 	*(BYTE*)0x4FD6AF = 0xe8;
@@ -147,6 +140,14 @@ bool apply_hooks() {
 
 	void AddCustomShader_w();
 	__jmp(0x4FD735, (int)AddCustomShader_w);
+
+	void CL_GlobalServers_f(void);
+	__jmp(0x413890, (int)CL_GlobalServers_f);
+
+	void R_Init();
+	__call(0x5035A2, (int)R_Init);
+	qboolean R_GetModeInfo(int mode, int* height, float* windowAspect, int* width);
+	__jmp(0x4B0EC0, (int)R_GetModeInfo);
 
 	return true;
 }

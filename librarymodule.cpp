@@ -34,9 +34,6 @@ HMODULE WINAPI hLoadLibraryA(LPSTR lpFileName) {
 			return hModule;
 		if (strstr(lpFileName, "ui_mp") && FileSize(lpFileName) < 0x249F0) //150kb
 			return hModule;
-		
-		void APIENTRY qglBindTexture(GLenum target, GLuint texture);
-		*(int*)0x16C439C = (int)qglBindTexture;
 
 		void UI_Init(DWORD);
 		UI_Init(pBase);
@@ -52,22 +49,11 @@ HMODULE WINAPI hLoadLibraryA(LPSTR lpFileName) {
 		void G_Init(DWORD);
 		G_Init(pBase);
 	}
-	//Com_Printf("^2dll name = %s\n", lpFileName);
 
 	return hModule;
 }
 
 void patch_opcode_loadlibrary(void) {
-	/*
-	int from = 0x4634AC;
-	DWORD tmp;
-	VirtualProtect((void*)from, 6, PAGE_EXECUTE_READWRITE, &tmp);
-	*(BYTE*)(from) = 0xbf;
-	*(int*)(from + 1) = (int)hLoadLibraryA;
-	*(BYTE*)(from + 5) = 0x90;
-	VirtualProtect((void*)from, 6, tmp, &tmp);
-	*/
-
 	orig_LoadLibraryA = (struct HINSTANCE__ *(__stdcall*)(const char*)) \
 	DetourFunction((LPBYTE)LoadLibraryA, (LPBYTE)hLoadLibraryA);
 }

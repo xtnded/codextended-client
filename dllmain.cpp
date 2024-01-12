@@ -50,6 +50,14 @@ void Main_SetSafeInit()
 	}
 }
 
+std::string GetExePath()
+{
+	char buffer[MAX_PATH];
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::string f = std::string(buffer);
+	return f.substr(0, f.find_last_of("\\/"));
+}
+
 #ifndef PROJECT_EXE
 BOOL APIENTRY DllMain(HMODULE hMod, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -67,6 +75,9 @@ BOOL APIENTRY DllMain(HMODULE hMod, DWORD ul_reason_for_call, LPVOID lpReserved)
 			GetModuleFileNameA(NULL, szModuleName, MAX_PATH);
 			void MSS32_Hook();
 			MSS32_Hook();
+
+			// Fix directory problem when game gets ran by e.g. Discord (directory will be Discord folder).
+			SetCurrentDirectoryA(GetExePath().c_str());
 
 			extern bool miles32_loaded;
 			if (!miles32_loaded)

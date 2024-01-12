@@ -28,13 +28,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -50,7 +50,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EXE|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -237,11 +237,9 @@
     <ClInclude Include="stockmapinfo.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="version_info.h" />
-    <ClInclude Include="xui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cgame.cpp" />
-    <ClCompile Include="cl_chat.cpp" />
     <ClCompile Include="cl_input.cpp" />
     <ClCompile Include="cl_main.cpp" />
     <ClCompile Include="codextended.cpp" />
@@ -268,7 +266,6 @@
     <ClCompile Include="exmaster_client.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="xm_phandler.cpp" />
-    <ClCompile Include="xui.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="fixes.cpp" />
     <ClCompile Include="xuidtool.cpp" />
@@ -277,7 +274,6 @@
     <ClCompile Include="mss32.cpp" />
     <ClCompile Include="net.cpp" />
     <ClCompile Include="render.cpp" />
-    <ClCompile Include="xtexture.cpp" />
     <ClCompile Include="shared.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="ui.cpp" />
@@ -290,7 +286,7 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs/detours/detours.lib" />
-    <Library Include="libs/libcurl/libcurl.lib" />
+   <Library Include="libs/libcurl/libcurl_a.lib" />
     <Library Include="libs/discord/discord-rpc.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

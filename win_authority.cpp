@@ -90,7 +90,7 @@ typedef struct {
 } cod_v_pair;
 
 cod_v_pair cod_v_info[] = {
-	{ COD_1, "753fbcabd0fdda7f7dad3dbb29c3c008" },
+	{ COD_1, "7b54e0259b24d32c16467ac454228418" }, // Modified, proper entry points, loads cod1x.dll instead of mss32.dll. f19da0d804bb20231572ee17225af339 - polish 7b54e0259b24d32c16467ac454228418 - md5 of english .exe
 	{ COD_1_SP, "9fa83933bbf659050a2f213c217b624c" },
 	//{ COD_1, "766345d1ceaf79caf7fe88a214b2f3ec" }, //from spect (different codmp entry points RVA import)
 	{ CODUO_51, "928dd08dc169bd85fdd12d2db28def70" },

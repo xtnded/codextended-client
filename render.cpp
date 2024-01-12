@@ -22,110 +22,11 @@ HWND hWnd = (HWND)0x8E5268;
 HGLRC hGLRC = (HGLRC)0x19BFFE8;
 
 
-unsigned int fontMainMenuHeader = 0;
-unsigned int fontIngameChatMessage = 0;
-unsigned int font14px = 0;
-
 //GLYPHMETRICSFLOAT gmf[256];
-
-void DestroyFonts() {
-	if (fontMainMenuHeader)
-		glDeleteLists(fontMainMenuHeader, 96);
-	if (fontIngameChatMessage)
-		glDeleteLists(fontIngameChatMessage, 96);
-	if (font14px)
-		glDeleteLists(font14px, 96);
-}
-
-bool GenerateFont(int fontsize, const char *fontname, unsigned int *base) {
-	bool ret = true;
-	if (base != nullptr&&*base)
-		return false;
-
-	fontsize *= -1;
-
-	//HDC hDC = GetDC(NULL);
-	HDC hDC = *(HDC*)0x19BFFE4;
-
-	HFONT	font;
-	HFONT	oldfont;
-
-	*base = glGenLists(96);
-
-	font = CreateFont(fontsize,
-		0, //font width
-		0, //escapement angle
-		0, //orientation angle
-		FW_NORMAL, //font weight
-		FALSE, //italic
-		FALSE, //underline
-		FALSE, //strikeout
-		ANSI_CHARSET, //character set identifier
-		OUT_TT_PRECIS, //output precision
-		CLIP_DEFAULT_PRECIS, //clipping precision
-		ANTIALIASED_QUALITY, //output quality
-		FF_DONTCARE | DEFAULT_PITCH, //family and pitch
-		fontname);
-
-	oldfont = (HFONT)SelectObject(hDC, font);
-	//if(!wglUseFontOutlinesA(hDC,32,96,base,0.0f,0.2f,WGL_FONT_POLYGONS,gmf)) {
-	if (!wglUseFontBitmapsA(hDC, 32, 96, *base)) {
-		//MsgBox(va("failed usefontbitmaps %s", GetLastErrorAsString().c_str()));
-		ret = false;
-	}
-	SelectObject(hDC, oldfont);
-	DeleteObject(font);
-	return ret;
-}
-
-cvar_t *cg_chat_font;
-
-void GenerateFonts() {
-	cg_chat_font = Cvar_Get("cg_chat_font", "Tahoma", CVAR_ARCHIVE);
-	GenerateFont(28, "Arial", &fontMainMenuHeader);
-	GenerateFont(14, cg_chat_font->string, &fontIngameChatMessage);
-	GenerateFont(14, "Verdana", &font14px);
-}
-
-void PrintFont(unsigned int fontID, const char *fmt, ...) {
-	char txt[256] = { 0 };
-	va_list va;
-	if (!fmt || !*fmt)
-		return;
-	if (!fontID)
-		return;
-
-	va_start(va, fmt);
-	vsprintf(txt, fmt, va);
-	va_end(va);
-
-	glPushAttrib(GL_LIST_BIT);
-	glListBase(fontID - 32);
-	glCallLists(strlen(txt), GL_UNSIGNED_BYTE, txt);
-	glPopAttrib();
-}
-
-GLvoid glPrint(const char *fmt, ...)					// Custom GL "Print" Routine
-{
-	char		text[256];								// Holds Our String
-	va_list		ap;										// Pointer To List Of Arguments
-
-	if (fmt == NULL)									// If There's No Text
-		return;											// Do Nothing
-
-	va_start(ap, fmt);									// Parses The String For Variables
-	vsprintf(text, fmt, ap);						// And Converts Symbols To Actual Numbers
-	va_end(ap);		
-
-	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
-	glListBase(fontMainMenuHeader - 32);								// Sets The Base Character to 32
-	glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);	// Draws The Display List Text
-	glPopAttrib();										// Pops The Display List Bits
-}
 
 /* custom shader text adding - Richard */
 
-char **s_shaderText = (char**)0x11EDD60;
+char** s_shaderText = (char**)0x11EDD60;
 
 #define GLOW_SHADER \
 	"glowshader2d                                        \n" \
@@ -159,7 +60,7 @@ void __declspec(naked) AddCustomShader_w() {
 	__asm
 	{
 		call AddCustomShader
-		mov eax, dword ptr [esp + 0x1c]
+		mov eax, dword ptr[esp + 0x1c]
 		push eax
 		mov eax, 0x4FD73A
 		jmp eax
@@ -167,7 +68,7 @@ void __declspec(naked) AddCustomShader_w() {
 }
 
 void* ri_Hunk_AllocAlign(int size) {
-	void*(*Hunk_AllocAlign)(int) = (void*(*)(int))0x432160;
+	void* (*Hunk_AllocAlign)(int) = (void* (*)(int))0x432160;
 
 	int s = size + strlen(GLOW_SHADER) + 2;
 	return Hunk_AllocAlign(s);
@@ -177,68 +78,9 @@ void* ri_Hunk_AllocAlign(int size) {
 
 
 void InitRender() {
-	GenerateFonts();
 }
 
 void DestroyRender() {
-	DestroyFonts();
-}
-
-void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba) {
-	SCR_AdjustFrom640(&x, &y, &w, &h);
-
-	glFinish();
-
-	if (!*(int*)0x16D8E70)
-		RB_SetGL2D();
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glColor4fv(rgba);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2f(x, y);
-
-	glTexCoord2f(1, 0);
-	glVertex2f(x + w, y);
-
-
-	glTexCoord2f(1, 1);
-	glVertex2f(x + w, y + h);
-
-
-	glTexCoord2f(0, 1);
-	glVertex2f(x, y + h);
-	glEnd();
-	glFlush();
-	glEnable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
-}
-
-void RGL_DrawPic(float x, float y, float w, float h, unsigned int tex) {
-	SCR_AdjustFrom640(&x, &y, &w, &h);
-
-	glFinish();
-
-	if (!*(int*)0x16D8E70)
-		RB_SetGL2D();
-	glColor3f(1, 1, 1);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2f(x, y);
-
-	glTexCoord2f(1, 0);
-	glVertex2f(x + w, y);
-
-
-	glTexCoord2f(1, 1);
-	glVertex2f(x + w, y + h);
-
-
-	glTexCoord2f(0, 1);
-	glVertex2f(x, y + h);
-	glEnd();
-	glFlush();
 }
 
 void RB_ShowImages() {
@@ -246,64 +88,13 @@ void RB_ShowImages() {
 
 	}
 	else {
-
-		cvar_t *xui_alt_chat = Cvar_Get("cg_xui_chat", "0", CVAR_ARCHIVE);
-
-		if (xui_alt_chat->integer) {
-			if (*cls_state > CA_CONNECTED) {
-				if (cg_chat_font->modified) {
-
-					if (fontIngameChatMessage) {
-						glDeleteLists(fontIngameChatMessage, 96);
-						fontIngameChatMessage = 0;
-					}
-
-					GenerateFont(14, cg_chat_font->string, &fontIngameChatMessage);
-				}
-				glDisable(GL_TEXTURE_2D);
-				glColor3f(1, 1, 1);
-				void CG_RenderChatMessages();
-				CG_RenderChatMessages();
-				glEnable(GL_TEXTURE_2D);
-
-				glDisable(GL_BLEND);
-			}
-		}
-		if (*cls_keyCatchers & KEYCATCH_UI) {
-			if (xui != nullptr) {
-				for (auto &i : xui->menus) {
-					if (!i->IsOpen())
-						continue;
-
-					if (!i->isGL)
-						continue;
-					/* custom menus */
-					bool Menu_IsMainOpen();
-					if (!Menu_IsMainOpen() && i->bMainHook)
-						continue;
-					/* end */
-
-					i->Render(false);
-				}
-			}
-
-			extern image_t *cursorImage;
-			//draw here own cursor
-			if (ui_cursor != nullptr && cursorImage != nullptr) {
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-				RGL_DrawPic(ui_cursor->x - 16, ui_cursor->y - 16, 32, 32, cursorImage->texnum);
-				glDisable(GL_BLEND);
-			}
-
-		}
 	}
 }
 
 /* Render stuff texture / geometry etc */
 
-shader_t *lastShader;
-extern cvar_t *cl_findshader;
+shader_t* lastShader;
+extern cvar_t* cl_findshader;
 
 bool hook_bind = false;
 
@@ -329,113 +120,29 @@ void RB_EndSurface(void) {
 	call();
 	endsurface.Apply();
 }
-
-void APIENTRY qglBindTexture(GLenum target, GLuint texture) {
-	glBindTexture(target, texture);
-}
-
-/*
-void __stdcall RB_BeginSurface() {
-	shader_t* shader;
-	__asm {
-		mov shader, ecx
-	}
-	lastShader = shader;
-
-	if (strstr(lastShader->name, cl_findshader->string) != NULL) {
-		hook_bind = true;
-	}
-
-	void(__stdcall *call)();
-	*(int*)&call = 0x4FF570;
-	__asm {
-		push 3
-			mov ecx, shader
-	}
-	call();
-}
-*/
+//Causing freezing?
+//void __stdcall RB_BeginSurface() {
+//	shader_t* shader;
+//	__asm {
+//		mov shader, ecx
+//	}
+//	lastShader = shader;
+//
+//	if (strstr(lastShader->name, cl_findshader->string) != NULL) {
+//		hook_bind = true;
+//	}
+//
+//	void(__stdcall *call)();
+//	*(int*)&call = 0x4FF570;
+//	__asm {
+//		push 3
+//			mov ecx, shader
+//	}
+//	call();
+//}
 
 static GLfloat rot = 0.0;
 static time_t rot_time = 0;
-
-void drawCube(vec3_t org, float size) {
-	glPushMatrix();
-	glTranslatef(org[0], org[1], org[2]);
-
-	glBegin(GL_QUADS);
-	// front face
-	glNormal3f(0, 0, 1);
-	glColor3f(1.0, 0.0, 0.0);
-	glTexCoord2d(0, 0);
-	glVertex3f(size / 2, size / 2, size / 2);
-	glVertex3f(-size / 2, size / 2, size / 2);
-	glVertex3f(-size / 2, -size / 2, size / 2);
-	glVertex3f(size / 2, -size / 2, size / 2);
-	// left face
-	glNormal3f(-1, 0, 0);
-	glColor3f(0.0, 1.0, 0.0);
-	glTexCoord2d(0, 1);
-	glVertex3f(-size / 2, size / 2, size / 2);
-	glVertex3f(-size / 2, -size / 2, size / 2);
-	glVertex3f(-size / 2, -size / 2, -size / 2);
-	glVertex3f(-size / 2, size / 2, -size / 2);
-	// back face
-	glNormal3f(0, 0, -1);
-	glColor3f(0.0, 0.0, 1.0);
-	glTexCoord2d(1, 0);
-	glVertex3f(size / 2, size / 2, -size / 2);
-	glVertex3f(-size / 2, size / 2, -size / 2);
-	glVertex3f(-size / 2, -size / 2, -size / 2);
-	glVertex3f(size / 2, -size / 2, -size / 2);
-	// right face
-	glNormal3f(1, 0, 0);
-	glColor3f(1.0, 1.0, 0.0);
-	glTexCoord2d(1, 1);
-	glVertex3f(size / 2, size / 2, size / 2);
-	glVertex3f(size / 2, -size / 2, size / 2);
-	glVertex3f(size / 2, -size / 2, -size / 2);
-	glVertex3f(size / 2, size / 2, -size / 2);
-	// top face
-	glNormal3f(0, 1, 0);
-	glColor3f(1.0, 0.0, 1.0);
-	glTexCoord2d(0, 0);
-	glVertex3f(size / 2, size / 2, size / 2);
-	glVertex3f(-size / 2, size / 2, size / 2);
-	glVertex3f(-size / 2, size / 2, -size / 2);
-	glVertex3f(size / 2, size / 2, -size / 2);
-	// bottom face
-	glNormal3f(0, -1, 0);
-	glColor3f(0.0, 1.0, 1.0);
-	glTexCoord2d(1, 0);
-	glVertex3f(size / 2, -size / 2, size / 2);
-	glVertex3f(-size / 2, -size / 2, size / 2);
-	glVertex3f(-size / 2, -size / 2, -size / 2);
-	glVertex3f(size / 2, -size / 2, -size / 2);
-	glEnd();
-
-	glPopMatrix();
-}
-
-void ExtraRender() {
-	cvar_t *t = Cvar_Get("extrarender", "0", 0); //without if u use r_showimages it crashes
-	if (!t->integer)
-		return;
-	//vec3_t org = {-8332,-8984,60};
-	vec3_t org = { -9527, -7515, 100 };
-	//vec3_t org = {-9528,-7626,200};
-
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_NORMALIZE);
-
-	drawCube(org, 60);
-
-	glColor3f(1, 1, 1);
-
-	glDisable(GL_COLOR_MATERIAL);
-	glDisable(GL_NORMALIZE);
-}
-
 
 UINT32 pExecuteRenderCommands = 0x4D8AB0;
 
@@ -448,4 +155,135 @@ void __declspec(naked) RB_ExecuteRenderCommands() {
 	}
 }
 
-void DrawTris(void *input) {}
+void DrawTris(void* input) {}
+
+void R_Init(void) {
+	void(*call)(void);
+	*(int*)&call = 0x4B4590;
+	call();
+
+	if (Cvar_VariableIntegerValue("r_borderless")) {
+		int width, height;
+		GetDesktopResolution(&width, &height);
+		SetWindowLongA(*gameWindow, GWL_EXSTYLE, 0);
+		SetWindowLongA(*gameWindow, GWL_STYLE, WS_VISIBLE | WS_POPUP);
+		MoveWindow(*gameWindow, 0, 0, width, height, 0);
+	}
+}
+
+// New vid modes with videscreen support. Not yet finalized.
+/*
+vidmode_t r_vidModes[] =
+{
+	{ "Mode  1: 640x480",	640,  480,  1 },
+	{ "Mode  2: 720x480",	720,  480,  1 },
+	{ "Mode  3: 800x600",	800,  600,  1 },
+	{ "Mode  4: 852x480",	852,  480,  1 },
+	{ "Mode  5: 1024x768",	1024, 768,  1 },
+	{ "Mode  6: 1152x864",	1152, 864,  1 },
+	{ "Mode  7: 1280x720",	1280, 720,  1 },
+	{ "Mode  8: 1280x960",	1280, 960,  1 },
+	{ "Mode  9: 1280x1024", 1280, 1024, 1 },
+	{ "Mode  9: 1366x768",  1280, 1024, 1 },
+	{ "Mode 11: 1440x900",	1440, 900,  1 },
+	{ "Mode 12: 1600x900",	1600, 900,  1 },
+	{ "Mode 13: 1600x1200", 1600, 1200, 1 },
+	{ "Mode 14: 1680x1050", 1680, 1050, 1 },
+	{ "Mode 15: 1720x1440", 1720, 1440, 1 },
+	{ "Mode 16: 1920x1080", 1920, 1080, 1 },
+	{ "Mode 17: 1920x1200", 1920, 1200, 1 },
+	{ "Mode 18: 2560x1080", 2560, 1080, 1 },
+	{ "Mode 19: 3440x1440", 3440, 1440, 1 },
+	{ "Mode 20: 3840x2160", 3840, 2160, 1 },
+	{ "Mode 21: 4096x2160", 4096, 2160, 1 },
+};
+*/
+//stock cod1 modes
+vidmode_t r_vidModes[] =
+{
+	{ "Mode  0: 320x240",          320,    240,    1 },
+	{ "Mode  1: 400x300",          400,    300,    1 },
+	{ "Mode  2: 512x384",          512,    384,    1 },
+	{ "Mode  3: 640x480",          640,    480,    1 },
+	{ "Mode  4: 800x600",          800,    600,    1 },
+	{ "Mode  5: 960x720",          960,    720,    1 },
+	{ "Mode  6: 1024x768",         1024,   768,    1 },
+	{ "Mode  7: 1152x864",         1152,   864,    1 },
+	{ "Mode  8: 1280x1024",        1280,   1024,   1 },
+	{ "Mode  9: 1600x1200",        1600,   1200,   1 },
+	{ "Mode 10: 2048x1536",        2048,   1536,   1 },
+	{ "Mode 11: 856x480 (wide)",   856,    480,    1 },
+	{ "Mode 12: 1920x1200 (wide)", 1920,   1200,   1 }
+};
+static int s_numVidModes = (sizeof(r_vidModes) / sizeof(r_vidModes[0]));
+
+qboolean R_GetModeInfo(int mode, int* height, float* windowAspect, int* width) {
+	if (Cvar_VariableIntegerValue("r_borderless")) {
+		GetDesktopResolution(glc_vidWidth, glc_vidHeight);
+		*windowAspect = (float)*glc_vidWidth / *glc_vidHeight;
+		return qtrue;
+	}
+
+	vidmode_t* vm;
+	mode = Cvar_VariableIntegerValue("r_mode");
+
+	if (mode < -1 || mode >= s_numVidModes)
+		return qfalse;
+
+	if (mode == -1) {
+		*glc_vidWidth = Cvar_VariableIntegerValue("r_customwidth");
+		*glc_vidHeight = Cvar_VariableIntegerValue("r_customheight");
+		*windowAspect = Cvar_VariableIntegerValue("r_customaspect");
+		return qtrue;
+	}
+
+	vm = &r_vidModes[mode];
+
+	*glc_vidWidth = vm->width;
+	*glc_vidHeight = vm->height;
+	*windowAspect = (float)vm->width / (vm->height * vm->pixelAspect);
+
+	return qtrue;
+}
+//__dev__
+//void R_ModeList_f() {
+//	int i;
+//	Com_Printf("\n");
+//	for (i = 0; i < s_numVidModes; i++) {
+//		Com_Printf("%s\n", r_vidModes[i].description);
+//	}
+//	Com_Printf("\n");
+//}
+//__dev__
+//void R_AdjustFrom640(float* x, float* y, float* w, float* h) {
+//	float widthScale = Cvar_VariableValue("r_scale_w");
+//	float heightScale = Cvar_VariableValue("r_scale_h");
+//	if (!widthScale) widthScale = 1;
+//	if (!heightScale) heightScale = 1;
+//
+//	float xscale = *((int*)0x15CA614) * 0.0015625;
+//	float yscale = *((int*)0x15CA618) * 0.0020833334;
+//
+//	if (x) *x *= xscale;
+//	if (y) *y *= yscale;
+//	if (w) *w *= xscale * widthScale;
+//	if (h) *h *= yscale * heightScale;
+//}
+
+//void R_Register() {
+//}
+//
+//void __declspec(naked) R_RegisterStub()
+//{
+//	const static uint32_t R_Register_func = 0x4B3300; // if that is the address of R_Register
+//	const static uint32_t retn_addr = 0x4B46B4; // address of instruction after your hook
+//	__asm
+//	{
+//		call    R_Register_func;
+//
+//		pushad; // save stack
+//		call    R_Register;
+//		popad; // restore stack
+//		jmp        retn_addr;
+//	}
+//}

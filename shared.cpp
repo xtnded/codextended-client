@@ -524,6 +524,63 @@ int Q_stricmp(const char *s1, const char *s2) {
 	return (s1 && s2) ? Q_stricmpn(s1, s2, 99999) : -1;
 }
 
+int I_isupper(int c)
+{
+	if (c >= 'A' && c <= 'Z')
+		return (1);
+	return (0);
+}
+
+int I_strnicmp(const char* s0, const char* s1, int n)
+{
+	int c1;
+	int c0;
+
+	assert(s0);
+	assert(s1);
+
+	if (!s0 || !s1)
+	{
+		return s1 - s0;
+	}
+
+	do
+	{
+		c0 = *s0++;
+		c1 = *s1++;
+
+		if (!n--)
+		{
+			return 0;       // strings are equal until end point
+		}
+
+		if (c0 != c1)
+		{
+			if (I_isupper(c0))
+			{
+				c0 += 32;
+			}
+			if (I_isupper(c1))
+			{
+				c1 += 32;
+			}
+			if (c0 != c1)
+			{
+				return c0 < c1 ? -1 : 1;
+			}
+		}
+	} while (c0);
+
+	return 0;
+}
+
+int I_stricmp(const char* s0, const char* s1)
+{
+	assert(s0);
+	assert(s1);
+	return I_strnicmp(s0, s1, 0x7FFFFFFF);
+}
+
 void Q_strcat(char *dest, int size, const char *src) {
 	int l1;
 
@@ -1021,4 +1078,18 @@ const char* Com_GametypeName(char* gt, bool colors) { // Keep colors for loading
 		return name;
 	else
 		return (colors) ? gt : Q_CleanStr(gt);
+}
+
+bool GetDesktopResolution(int* pHorizontal, int* pVertical) {
+	RECT desktopRectangle;
+	const HWND desktopHandle = GetDesktopWindow();
+
+	if (desktopHandle && GetWindowRect(desktopHandle, &desktopRectangle)) {
+		*pHorizontal = desktopRectangle.right;
+		*pVertical = desktopRectangle.bottom;
+
+		return true;
+	}
+
+	return false;
 }

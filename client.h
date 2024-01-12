@@ -14,12 +14,19 @@
 #define clc_connectPacketCount ((PINT)0x15CE884)
 #define cls_keyCatchers ((PINT)0x155F2C4)
 #define cls_servername ((char*)0x155F2CC)
+#define cls_numglobalservers ((int*)0x1565004)
+#define cls_numGlobalServerAddresses ((int*)0x15C1008)
+#define cls_pingUpdateSource ((int*)0x15C9C10)
 
 static void(*CL_AddReliableCommand)(const char *cmd) = (void(*)(const char*))0x40E2F0;
 static const char* (*CL_TranslateStringBuf)(const char *string) = (const char*(*)(const char*))0x4A9E20;
 
 #define cs0 (clc_stringData + clc_stringOffsets[0])
 #define cs1 (clc_stringData + clc_stringOffsets[1])
+
+#define gameWindow ((HWND*)0x16C35E8)
+#define glc_vidWidth ((int*)0x16C3AE4)
+#define glc_vidHeight ((int*)0x16C3AE8)
 
 static bool unlock_client_structure() {
 	__try {

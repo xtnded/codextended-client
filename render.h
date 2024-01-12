@@ -1,46 +1,8 @@
 #include "stdafx.h"
 #include "gl/gl.h"
 #include "gl/glu.h"
-#pragma comment(lib, "opengl32")
-#pragma comment(lib, "glu32.lib")
 #include "keys.h"
 #include <memory>
-
-class XTexture {
-public:
-
-	unsigned int width, height;
-	unsigned int textureID;
-	union {
-		struct {
-			unsigned int bp1, bp2;
-		};
-		unsigned long long blendparms;
-	};
-
-	bool loaded;
-
-	void Delete();
-
-	void Bind();
-
-	void SetBlending(unsigned int a, unsigned int b) {
-		blendparms = (a << 32) | (b & 0xfffffffff);
-	}
-
-	bool Load(const char*);
-	bool LoadFromMemory(const unsigned char*, size_t);
-
-	XTexture() : loaded(false), blendparms(-1) {}
-
-	XTexture(const char* fn) : XTexture() {
-		Load(fn);
-	}
-
-	XTexture(const unsigned char *buf, size_t buflen) : XTexture() {
-		LoadFromMemory(buf, buflen);
-	}
-};
 
 #pragma push(pack, 1)
 typedef struct image_s {
@@ -122,13 +84,3 @@ extern SCR_DrawString_t SCR_DrawString;
 
 typedef void(*RB_SetGL2D_t)(void);
 extern RB_SetGL2D_t RB_SetGL2D;
-
-void RGL_DrawQuad(float x, float y, float w, float h, vec4_t rgba);
-void RGL_DrawPic(float, float, float, float, unsigned int);
-void PrintFont(unsigned int fontID, const char *fmt, ...);
-
-extern unsigned int fontMainMenuHeader;
-extern unsigned int fontIngameChatMessage;
-extern unsigned int font14px;
-
-#include "xui.h"

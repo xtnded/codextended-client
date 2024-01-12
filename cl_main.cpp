@@ -6,7 +6,6 @@
 
 #pragma comment(lib, "psapi.lib")
 
-#include "Psapi.h"
 #include "Shlwapi.h"
 
 cvar_t *cl_running;
@@ -15,19 +14,23 @@ cvar_t *cl_wwwDownload;
 cvar_t *cl_allowDownload;
 cvar_t *cl_console_fraction;
 cvar_t *cl_findshader;
-cvar_t *cl_font_type;
 
 cvar_t *cg_drawheadnames;
-cvar_t *cg_xui_scoreboard;
 cvar_t *cg_fov;
-cvar_t *cg_zoomSensitivity_ratio;
+cvar_t* cg_x_discord;
+
+cvar_t* g_bounce;
+
+cvar_t* com_hunkmegs;
+cvar_t* x_master;
+
+cvar_t* r_borderless;
 
 DWORD __glob_wd_threadid;
 HANDLE __glob_wd_threadhandle;
 std::string res;
 
 #include <sstream>
-#include <cstdint>
 
 void CL_Connect_f() {
 	void(*o)() = (void(*)())0x40F6A0;
@@ -47,17 +50,9 @@ void CL_Connect_f() {
 
 void(*CL_DownloadsComplete)(void) = (void(*)())0x40FFB0;
 
-void Need_Paks() {
-	return;
-}
-
-char* MAX_PACKET_USERCMDS() {
-	return false;
-}
-
 void DL_Name(const char *localName, char* remoteName) {
 	char *downloadName = Cvar_VariableString("cl_downloadName");
-	Cvar_Set("cl_downloadName", va("        %s", (char*)remoteName)); // Enough spaces to render name fully. :P
+	Cvar_Set("cl_downloadName", va("        %s", remoteName)); // Enough spaces to render name fully. :P
 }
 
 static int use_regular_dl = 0;
@@ -126,7 +121,7 @@ void WWW_BeginDownload(void) {
 
 			if (!DL_BeginDownload(localTempName, remoteTempName, 1)) {
 				clc_bWWWDl = false;
-				const char *error = va("Download failure while getting '%s'\n", remoteTempName); // get the msg before clearing structs
+				char *error = va("Download failure while getting '%s'\n", remoteTempName); // get the msg before clearing structs
 
 				Com_Error(ERR_DROP, error);
 				return;
@@ -147,12 +142,22 @@ void WWW_BeginDownload(void) {
 
 void X_CL_NextDownload(void) {
 	char* info = clc_stringData + clc_stringOffsets[1];
-	char *url = Info_ValueForKey(info, "sv_wwwBaseURL");
+	char* url = Info_ValueForKey(info, "sv_wwwBaseURL");
+	int argc = Cmd_Argc();
 
-	if(cl_wwwDownload->integer && *url )
+	if (argc > 1) {
+		const char* arg1 = Info_ValueForKey(info, "sv_referencedPakNames");
+
+		if (strstr(arg1, ".pk3") != NULL) { //so if extension is not pk3 but is (exe,bat and any other) kick player (So you can't dl .exe,.bat,.cfg)
+			Com_Error(ERR_DROP, "It's likely that this server will infect your computer with malware. \n We do not permit connections to such servers in order to protect your security.");
+			return;
+		}
+	}
+
+	if (cl_wwwDownload->integer && *url)
 		WWW_BeginDownload();
 	else
-	    CL_NextDownload();
+		CL_NextDownload();
 }
 
 void CL_WWWDownload() {
@@ -206,10 +211,17 @@ void CL_FOVLimit() {
 }
 
 void CL_FPSLimit() {
-	char* fps = Cvar_VariableString("com_maxfps");
-	if (atoi(fps) < 30 || atoi(fps) > 333) {
-		Com_Printf("com_maxfps \"%s\" is invalid. Allowed values: \"30\" - \"333\".\n", fps);
-		Cvar_Set("com_maxfps", "60");
+	int fps = Cvar_VariableIntegerValue("com_maxfps");
+	int cheats = atoi(Info_ValueForKey(cs1, "sv_cheats"));
+
+	char* sv_fps_min = Info_ValueForKey(cs1, "sv_fps_min");
+	char* sv_fps_max = Info_ValueForKey(cs1, "sv_fps_max");
+	int fpsMin = strlen(sv_fps_min) ? atoi(sv_fps_min) : 30;
+	int fpsMax = strlen(sv_fps_max) ? atoi(sv_fps_max) : 333;
+
+	if ((fps < fpsMin || fps > fpsMax) && cheats != 1) {
+		Com_Printf("com_maxfps \"%d\" is invalid. Allowed values: \"%d\" - \"%d\".\n", fps, fpsMin, fpsMax);
+		Cvar_Set("com_maxfps", "85");
 	}
 }
 
@@ -236,7 +248,8 @@ void CL_Frame(int msec) {
 		CL_WWWDownload();
 
 	void CL_DiscordFrame();
-	CL_DiscordFrame();
+	if (cg_x_discord->integer)
+		CL_DiscordFrame();
 
 	CL_FOVLimit();
 	CL_FPSLimit();
@@ -245,7 +258,101 @@ void CL_Frame(int msec) {
 	call(msec);
 }
 
+void Cmd_Borderless() {
+	if (Cmd_Argc() > 1) {
+		Cvar_Set("r_borderless", Cmd_Argv(1));
+
+		if (Cvar_VariableIntegerValue("r_borderless")) {
+			Cvar_Set("r_fullscreen", "0");
+			Cvar_Set("r_mode", "-1");
+			Cvar_Set("com_introplayed", "1");
+		}
+
+		void(*Cbuf_ExecuteText)(const char*);
+		*(UINT32*)&Cbuf_ExecuteText = 0x428A80;
+		char cmd[10];
+		sprintf(cmd, "vid_restart", cmd);
+		Cbuf_ExecuteText(cmd);
+	}
+	else {
+		Com_Printf("\"r_borderless\" is:\"%d\" default: \"0\"\n", Cvar_VariableIntegerValue("r_borderless"));
+	}
+}
+
+void Cmd_Minimize() {
+	ShowWindow(*gameWindow, SW_MINIMIZE);
+}
+
 int *whiteShader = (int*)0x15CA630;
+
+const char* CL_GetConfigString(int index) {
+	// Check if the index is within bounds
+	if (index < 0 || index >= 2048) {
+		Com_Error(ERR_FATAL, "GetConfigString index out of bounds");
+	}
+
+	// Calculate the offset based on the index
+	int offset = clc_stringOffsets[index];
+
+	// Check if the offset is zero (empty string)
+	if (!offset) {
+		return "";
+	}
+
+	// Return the actual config string
+	return clc_stringData + offset;
+}
+
+void CL_OpenScriptMenu(void)
+{
+	char* parentMenuName;
+	const char* scriptMenuResponse;
+	int menuIndex;
+	char* command;
+	int* dword_163B3E0 = (int*)(0x163B3E0);
+	int* dword_161747C = (int*)(0x161747C);
+
+	if (Cmd_Argc() == 3)
+	{
+		if (*(dword_163B3E0 + 32))
+		{
+			if (dword_161747C)
+			{
+				parentMenuName = Cmd_Argv(1);
+				scriptMenuResponse = Cmd_Argv(2);
+
+				if (parentMenuName && scriptMenuResponse)
+				{
+					menuIndex = -1;
+					for (int i = 0; i < 32; ++i) {
+						const char* configString = CL_GetConfigString(i + 1180);
+
+						if (*configString && !I_stricmp(parentMenuName, configString)) {
+							menuIndex = i;
+							break;
+						}
+					}
+
+					if (menuIndex != -1) {
+						int serverId = Cvar_VariableIntegerValue("sv_serverId");
+						command = va("cmd mr %i %i %s\n", serverId, menuIndex, scriptMenuResponse);
+						void(*Cbuf_ExecuteText)(const char*);
+						*(UINT32*)&Cbuf_ExecuteText = 0x428A80;
+						Cbuf_ExecuteText(command);
+					}
+					else {
+						Com_Printf("Menu '%s' not found!\n", parentMenuName);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		Com_Printf("USAGE: openScriptMenu <parent menu name> <script menu response>\n");
+		Com_Printf("EXAMPLE: openScriptMenu quickcommands 1\n");
+	}
+}
 
 void CL_Init(void) {
 	bool fix_bugs();
@@ -265,43 +372,38 @@ void CL_Init(void) {
 	cl_allowDownload = Cvar_Get("cl_allowDownload", "0", CVAR_ARCHIVE);
 	cl_console_fraction = Cvar_Get("cl_console_fraction", "1.0", CVAR_ARCHIVE);
 	cl_findshader = Cvar_Get("cl_findshader", "not-an-existing-shader", 0);
-	cl_font_type = Cvar_Get("cl_font_type", "1", CVAR_ARCHIVE);
 	cg_drawheadnames = Cvar_Get("cg_drawheadnames", "0", 0);
-	cg_xui_scoreboard = Cvar_Get("cg_xui_scoreboard", "0", 0);
 	cg_fov = Cvar_Get("cg_fov", "80", CVAR_ARCHIVE);
-	cg_zoomSensitivity_ratio = Cvar_Get("sensitivityRatioAds", "1.0", CVAR_ARCHIVE);
+	cg_x_discord = Cvar_Get("cg_x_discord", "1", CVAR_LATCH | CVAR_ARCHIVE);
+	com_hunkmegs = Cvar_Get("com_hunkmegs", "128", CVAR_LATCH | CVAR_ARCHIVE);
+	x_master = Cvar_Get("x_master", "0", CVAR_ARCHIVE);
+	g_bounce = Cvar_Get("g_bounce", "0", CVAR_ARCHIVE);
 
+	Cvar_Get("cg_thirdperson", "0", CVAR_ARCHIVE);
 	Cvar_Set("version", va("COD MP 1.1x build %d %s %s win-x86", BUILDNUMBER, __DATE__, __TIME__));
-	Cvar_Set("shortversion", "1.1x");
+	Cvar_Set("shortversion", va("1.1x (%d)", BUILDNUMBER));
 
-	Cvar_Get("g_scoreboard_kills", "Kills", 0);
-	Cvar_Get("g_scoreboard_deaths", "Deaths", 0);
-	Cvar_Get("g_scoreboard_ping", "Ping", 0);
 	Cvar_Get("cg_x_obituary", "1", 0);
+	Cvar_Get("r_borderless", "0", CVAR_ARCHIVE);
+
+	Cmd_AddCommand("r_borderless", Cmd_Borderless);
+	Cmd_AddCommand("minimize", Cmd_Minimize);
+	Cmd_AddCommand("openScriptMenu", CL_OpenScriptMenu);
 
 	Cvar_Set("r_overbrightbits", "0");
 	Cvar_Set("r_ignorehwgamma", "0");
 	Cvar_Set("cl_languagewarnings", "0");
 	Cvar_Set("cl_languagewarningsaserrors", "0");
-	Cvar_Set("com_hunkmegs", "512");
 
-	#if 0
-		// None of these seem to work.
-		char*(__fastcall*CL_TranslateString)(const char *string, char *buf, int);
-		*(int*)&CL_TranslateString = 0x4ABF00;
-		static const char* (*CL_TranslateStringBuf2)(const char *string, const char *type) = (const char*(*)(const char*,const char*))0x4A9E20;
-		MsgBox(CL_TranslateString("EXE_ENDOFGAME",buf,0));
-		const char *b = CL_TranslateStringBuf2("CGAME_PRONE_BLOCKED", "cgame");
-		if (b == nullptr)
-			b = "(null)";
-		MsgBox(b);
-	#endif
+	void CL_DiscordInitialize();
+	if (cg_x_discord->integer)
+		CL_DiscordInitialize();
 }
 
 void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after console
-	void(*call)(stereoFrame_t);
-	*(int*)(&call) = 0x416DD0;
-	call(stereoFrame);
+	void(*oSCR_DrawScreenField)(stereoFrame_t);
+	*(int*)(&oSCR_DrawScreenField) = 0x416DD0;
+	oSCR_DrawScreenField(stereoFrame);
 
 #if 0
 	extern FILE* dl_file;
@@ -317,4 +419,51 @@ void SCR_DrawScreenField(stereoFrame_t stereoFrame) { //TODO fix draw after cons
 
 char* __cdecl CL_SetServerInfo_HostnameStrncpy(char* a1, char* a2, size_t a3) {
 	return strncpy(a1, Com_CleanHostname(a2, true), a3);
+}
+
+void CL_GlobalServers_f(void) {
+	if (Cmd_Argc() < 3) {
+		Com_Printf("usage: globalservers <master# 0-1> <protocol> [keywords]\n");
+		return;
+	}
+
+	/*
+	if (x_master->integer) {
+		void XMaster_GetServers();
+		XMaster_GetServers();
+	}
+	*/
+
+	netadr_t to;
+	int i;
+	int count;
+	char* buffptr;
+	char command[1024];
+
+	*cls_numglobalservers = -1;
+	*cls_pingUpdateSource = 1;
+
+	if (x_master->integer) {
+		if (NET_StringToAdr("cod.pm", &to)) {
+			Com_Printf("Requesting servers from CoD 1.1x master...\n");
+		}
+	}
+	else {
+		if (NET_StringToAdr("codmaster.activision.com", &to)) {
+			Com_Printf("Requesting servers from codmaster.activision.com...\n");
+		}
+	}
+
+	short BigShort(short);
+	to.type = NA_IP;
+	to.port = BigShort(20510);
+
+	sprintf(command, "getservers %s", Cmd_Argv(2));
+
+	buffptr = command + strlen(command);
+	count = Cmd_Argc();
+	for (i = 3; i < count; i++)
+		buffptr += sprintf(buffptr, " %s", Cmd_Argv(i));
+
+	NET_OutOfBandPrint(NS_SERVER, to, command);
 }
