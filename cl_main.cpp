@@ -34,16 +34,16 @@ std::string res;
 
 void CL_Connect_f() {
 	void(*o)() = (void(*)())0x40F6A0;
-
+	
 	o();
 	
-    if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
-        Cvar_Set("cl_allowDownload", "0");
-    }        
-
-    char* info = clc_stringData + clc_stringOffsets[1];
-    char *fs_game = Info_ValueForKey(info, "fs_game"); // Reset client fs_game if loaded & server doesn't use it.
-	if (fs_game == "") {
+	if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
+	Cvar_Set("cl_allowDownload", "0");
+	}        
+	
+	char* info = clc_stringData + clc_stringOffsets[1];
+	char *fs_game = Info_ValueForKey(info, "fs_game"); // Reset client fs_game if loaded & server doesn't use it.
+	if (strlen(fs_game)) {
 		Cvar_Set("fs_game", ""); 
 	}
 }
