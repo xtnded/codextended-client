@@ -38,7 +38,7 @@ void CL_Connect_f() {
 	o();
 	
     if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
-        Cvar_Set("cl_allowDownload", "0");
+        //Cvar_Set("cl_allowDownload", "0");
     }        
 
     char* info = clc_stringData + clc_stringOffsets[1];
