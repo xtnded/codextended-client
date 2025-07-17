@@ -34,16 +34,16 @@ std::string res;
 
 void CL_Connect_f() {
 	void(*o)() = (void(*)())0x40F6A0;
-
+	
 	o();
 	
-    if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
-        Cvar_Set("cl_allowDownload", "0");
-    }        
-
-    char* info = clc_stringData + clc_stringOffsets[1];
-    char *fs_game = Info_ValueForKey(info, "fs_game"); // Reset client fs_game if loaded & server doesn't use it.
-	if (fs_game == "") {
+	if (*cls_state == CA_CONNECTING || *cls_state == CA_CHALLENGING) {
+	Cvar_Set("cl_allowDownload", "0");
+	}        
+	
+	char* info = clc_stringData + clc_stringOffsets[1];
+	char *fs_game = Info_ValueForKey(info, "fs_game"); // Reset client fs_game if loaded & server doesn't use it.
+	if (strlen(fs_game)) {
 		Cvar_Set("fs_game", ""); 
 	}
 }
@@ -119,6 +119,8 @@ void WWW_BeginDownload(void) {
 			Q_strncpyz(remoteTempName, FS_BuildOSPath(url, remoteName, ""), sizeof(remoteTempName));
 			remoteTempName[strlen(remoteTempName) - 1] = '\0';
 
+			CL_AddReliableCommand(va("download %s", remoteName));
+			
 			if (!DL_BeginDownload(localTempName, remoteTempName, 1)) {
 				clc_bWWWDl = false;
 				char *error = va("Download failure while getting '%s'\n", remoteTempName); // get the msg before clearing structs
