@@ -22,5 +22,10 @@ bool fix_bugs() {
 	__nop(0x40BC18, 5); //fixes spam with "MAX_PACKET_USERCMDS" if you have 1000 fps
 	__nop(0x43BA04, 5); //Removing second "Need Paks:" because it's useless one is enough
 
+	// do not print list of GL extensions to avoid crashing
+	__nop(0x4B2EC0, 6); // GL_EXTENSIONS print in GlxInfo_f
+	__nop(0x4B2ED4, 6); // WGL_EXTENSIONS print in GlxInfo_f
+	__nop(0x508D18, 6); // another GL_EXTENSIONS print
+
 	return ret;
 }
